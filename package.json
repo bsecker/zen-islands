@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "three": "^0.151.3"
+  },
+  "devDependencies": {
+    "esm": "^3.2.25",
+    "sharp": "^0.32.0",
+    "vite": "^4.2.1"
+  }
+}
