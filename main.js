@@ -4,10 +4,11 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const WIDTH = 4096;
 const HEIGHT = 4096;
-const RENDER_WATER = true;
+const RENDER_WATER = false;
 
 // create the scene
 const scene = new THREE.Scene();
+const ports = [];
 
 // create the camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
@@ -61,27 +62,51 @@ function distance(x1, y1, x2, y2) {
  * @param {*} x 
  * @param {*} y 
  */
-function islandise(x, y) {
+function islandise_round(x, y) {
     const dist = distance(0, 0, x, y);
     const maxDist = WIDTH / 2;
+    // if distance is larger than the max distance, scale it back to 0 quicker
+    if (dist > maxDist) {
+        return 5/dist
+    }
+
     // normalise
-    return 1 - (dist / maxDist);
+    return 1.00 - (dist / maxDist);
+}
+
+/**
+ * given a set of coords (x,y), apply a square mask to the coords so that the edges are lower than the center
+ */
+function islandise_square(x,y) {
+    const distance_x = Math.abs(-x);
+    const distance_y = Math.abs(-y);
+
+    const distance = Math.max(distance_x, distance_y);
+    const max_width = (WIDTH * 0.5);
+    const delta = distance / max_width;
+    const gradient = delta * delta;
+
+    return Math.max(0, 1.0-gradient);
 }
 
 function getColor(height) {
-    switch(height) {
-        case height < 1: return 0x0000ff; // water 
-        case height < 5: return 0x505050; // sand
-        case height < 200: return 0x074709; // grass
-        default: return 0xffffff; // snow
+    let color = 0x000000;
+    switch(true) {
+        case height < 1: color = 0x0000ff; break; // water 
+        case height < 10: color = 0x505050; break; // sand
+        case height < 100: color = 0x074709; break // grass
+        case height < 150: color = 0x295e2b; break; // darker grass
+        case height < 170: color = 0x697f6a; break; // dirt
+        default: color = 0xffffff; // snow
     }
+
+    return color;
 }
 
-function refreshVertices() {
+function generate_terrain() {
     // create land mesh
-    const geometry = new THREE.PlaneGeometry(WIDTH, HEIGHT, 256, 256);
-    const material = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors });
-    // const material = new THREE.MeshLambertMaterial({ color: 0x074709 });
+    const geometry = new THREE.PlaneGeometry(WIDTH, HEIGHT, 2048, 2048);
+    const material = new THREE.MeshLambertMaterial({ vertexColors: true });
     // const material = new THREE.MeshLambertMaterial({ color: 0x505050 });
 
     var vertices = geometry.attributes.position.array;
@@ -98,18 +123,16 @@ function refreshVertices() {
             0.0008,
             -300,
             300
-        )
-            // * islandise(
-            //     terrain.position.x + vertices[i],
-            //     terrain.position.y + vertices[i + 1],
-            // )
+        ) 
+        * islandise_round(vertices[i], vertices[i + 1])
 
-        if (RENDER_WATER && vertices[i + 2] < 0) {
+        if (vertices[i + 2] < 0) {
             vertices[i + 2] = 0;
         }
 
         // color vertices based on height
-        color.setHex(vertices[i+2])
+        color.setHex(getColor(vertices[i+2]));
+        // console.log("height", vertices[i+2], "color", color.r, color.g, color.b)
         colors.push(color.r, color.g, color.b);
 
     }
@@ -125,7 +148,10 @@ function refreshVertices() {
     terrain.geometry.computeVertexNormals();
 }
 
-refreshVertices();
+function generate_cities() {
+}
+
+generate_terrain();
 // renderer.render(scene, camera);
 
 function animate() {
