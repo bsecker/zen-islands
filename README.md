@@ -6,7 +6,7 @@
 - [ ] improve islandiser so outsides aren't just sandbars.
   - Custom curve? start shallow (so can have lots of mountainous in middle), get steep at end?
   - Also need a way to make the island not look completely circularised
-
+- [ ] make water 3d - don't set to 0, maybe translucent overlay?
 
 ## Resources
 

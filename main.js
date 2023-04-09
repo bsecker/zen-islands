@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { SimplexNoise } from './noise'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Port } from './ships';
 
 const WIDTH = 4096;
 const HEIGHT = 4096;
@@ -9,6 +10,7 @@ const RENDER_WATER = false;
 // create the scene
 const scene = new THREE.Scene();
 const ports = [];
+const ships = [];
 
 // create the camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
@@ -104,6 +106,8 @@ function getColor(height) {
 }
 
 function generate_terrain() {
+    console.log("generating terrain...")
+
     // create land mesh
     const geometry = new THREE.PlaneGeometry(WIDTH, HEIGHT, 2048, 2048);
     const material = new THREE.MeshLambertMaterial({ vertexColors: true });
@@ -146,12 +150,45 @@ function generate_terrain() {
 
     terrain.geometry.attributes.position.needsUpdate = true;
     terrain.geometry.computeVertexNormals();
+
+    return terrain;
 }
 
-function generate_cities() {
+/**
+ * I guess a better algorithm would be:
+ * - run a convolution filter over the array, take the average of points, if close to 0 then add to list
+ */
+
+function generate_ports(terrain) {
+    console.log("generating ports...")
+
+    const vertices = terrain.geometry.attributes.position.array;
+
+    // generate a list of coordinates where y = 1
+    const shore_coords = [];
+    for (let i=0; i<=vertices.length; i+=3) {
+        if (vertices[i+2] > 1 && vertices[i+2] < 2) {
+            shore_coords.push([vertices[i], vertices[i+1], vertices[i+2]]);
+        }
+    }
+
+    console.log(shore_coords.length)
+
+    for (let i=0; i<30; i++) {
+
+        // pick a random coordinate from the list
+        const coord = shore_coords[Math.floor(Math.random() * shore_coords.length)];
+        console.log("found", coord);
+
+        // TODO remove picked from list
+
+        const port = new Port(scene, coord[0], coord[2], -coord[1]);
+        ports.push(port);
+    }
 }
 
-generate_terrain();
+const terrain = generate_terrain();
+generate_ports(terrain);
 // renderer.render(scene, camera);
 
 function animate() {
