@@ -26,7 +26,13 @@ document.body.appendChild(renderer.domElement);
 
 // Orbit camera
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
 controls.minZoom = 10;
+controls.mouseButtons = {
+	RIGHT: THREE.MOUSE.ROTATE,
+	MIDDLE: THREE.MOUSE.DOLLY,
+	LEFT: THREE.MOUSE.PAN
+}
 // camera.position.set( 0, 20, 100 );
 controls.update();
 
@@ -47,10 +53,6 @@ if (RENDER_WATER) {
 var light = new THREE.DirectionalLight(0xffffff, 2.3);
 light.position.set(camera.position.x, camera.position.y + 500, camera.position.z + 500).normalize();
 scene.add(light);
-
-// const pointLight = new THREE.PointLight(0xffffff, 1);
-// pointLight.position.set(5, 5, 5);
-// scene.add(pointLight);
 
 
 const perlin = new SimplexNoise();
@@ -112,6 +114,7 @@ function generate_terrain() {
     const geometry = new THREE.PlaneGeometry(WIDTH, HEIGHT, 2048, 2048);
     const material = new THREE.MeshLambertMaterial({ vertexColors: true });
     // const material = new THREE.MeshLambertMaterial({ color: 0x505050 });
+
 
     var vertices = geometry.attributes.position.array;
 
@@ -187,9 +190,29 @@ function generate_ports(terrain) {
     }
 }
 
-const terrain = generate_terrain();
-generate_ports(terrain);
-// renderer.render(scene, camera);
+function generate_node_graph() {
+    console.log("calculating pathfinding graph...")
+
+    const water_verticies = terrain.geometry.attributes.position.array;
+    const water_points = [];
+
+    for (let i=0; i < water_verticies.length; i+=3) {
+        if (water_verticies[i+2] <= 0) {
+            water_points.push([water_verticies[i], water_verticies[i+1], water_verticies[i+2]]);
+        }
+    }
+
+    console.log("water points", water_points.length)
+    return water_points;
+}
+
+/**
+ * Iterate through all faces in the mesh, and if the face has all y coords equal to 0, add to list
+ */
+function get_water_faces(terrain) {
+    const faces = terrain.geometry.attributes.position.array;
+    console.log(faces.slice(0, 30));
+}
 
 function animate() {
 
@@ -201,4 +224,9 @@ function animate() {
     renderer.render(scene, camera);
 
 }
+
+const terrain = generate_terrain();
+generate_ports(terrain);
+generate_node_graph();
+// get_water_faces(terrain);
 animate();
