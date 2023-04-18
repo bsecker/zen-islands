@@ -5,6 +5,7 @@
   "devDependencies": {
     "esm": "^3.2.25",
     "sharp": "^0.32.0",
+    "typescript": "^5.0.4",
     "vite": "^4.2.1"
   }
 }

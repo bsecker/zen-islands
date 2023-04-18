@@ -1,5 +1,6 @@
 import { writeFileSync } from 'fs';
 import { SimplexNoise } from './noise.js';
+import { generateTerrain } from './terrain.js';
 const sharp = require('sharp');
 
 // Define the size of the heightmap
@@ -14,30 +15,32 @@ const frequency = 0.005;
 const amplitude = 1;
 const octaves = 4;
 
-// Generate the heightmap
-const heightmap = [];
-for (let y = 0; y < height; y++) {
-  const row = [];
-  for (let x = 0; x < width; x++) {
-    // Calculate the noise value for this point
-    // const noiseValue = perlin.noise(x / smoothing, y / smoothing);
-    const noiseValue = perlin.simplex_noise(x, y, frequency, amplitude, octaves);
-    // Map the noise value to a height value between 0 and 255
-    let heightValue = Math.floor((noiseValue + 1) * 127.5);
-    // limit noise between 0 and 255
+// // Generate the heightmap
+// const heightmap = [];
+// for (let y = 0; y < height; y++) {
+//   const row = [];
+//   for (let x = 0; x < width; x++) {
+//     // Calculate the noise value for this point
+//     // const noiseValue = perlin.noise(x / smoothing, y / smoothing);
+//     const noiseValue = perlin.simplex_noise(x, y, frequency, amplitude, octaves);
+//     // Map the noise value to a height value between 0 and 255
+//     let heightValue = Math.floor((noiseValue + 1) * 127.5);
+//     // limit noise between 0 and 255
 
-    // console.log("noise", noiseValue, "height", heightValue)
-    // Add the height value to the row
-    row.push(heightValue);
-  }
-  // Add the row to the heightmap
-  heightmap.push(row);
-}
+//     // console.log("noise", noiseValue, "height", heightValue)
+//     // Add the height value to the row
+//     row.push(heightValue);
+//   }
+//   // Add the row to the heightmap
+//   heightmap.push(row);
+// }
+
+const heightmap = generateTerrain(new SimplexNoise(), width, height, octaves, 0.501, 0.0008, -300, 300);
 
 /**
  * convert the heightmap to a png using the sharp library 
  */ 
-function save_heightmap(heightmap, width, height) {
+export function save_heightmap(heightmap, width, height) {
   const buffer = Buffer.alloc(width * height * 4);
     for (let y = 0; y < height; y++) {
       const row = heightmap[y];
