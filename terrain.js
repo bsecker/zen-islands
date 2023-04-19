@@ -1,5 +1,5 @@
 export function distance(x1, y1, x2, y2) {
-    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
 /**
@@ -8,15 +8,15 @@ export function distance(x1, y1, x2, y2) {
  * @param {*} y 
  */
 function islandise_round(x, y, width) {
-    const dist = distance(width/2, width/2, x, y);
-    const maxDist = width / 2;
-    // if distance is larger than the max distance, scale it back to 0 quicker
-    if (dist > maxDist) {
-        return 5/dist
-    }
+  const dist = distance(width / 2, width / 2, x, y);
+  const maxDist = width / 2;
+  // if distance is larger than the max distance, scale it back to 0 quicker
+  if (dist > maxDist) {
+    return 5 / dist
+  }
 
-    // normalise
-    return 1.00 - (dist / maxDist);
+  // normalise
+  return 1.00 - (dist / maxDist);
 }
 
 /**
@@ -36,24 +36,24 @@ function islandise_round(x, y, width) {
 
 
 
-export function generateTerrain(noise, width, height, octaves=7, persistence=0.501, scale=0.0008, low=-300, high=300) {
-    console.log("generating terrain...")
+export function generateTerrain(noise, width, height, octaves = 7, persistence = 0.501, scale = 0.0008, low = -300, high = 300) {
+  console.log("generating terrain...")
 
-    // fill empty array
-    const terrain = Array(height).fill().map(() => Array(width).fill(0));
+  // fill empty array
+  const terrain = Array(height).fill().map(() => Array(width).fill(0));
 
-    // run perlin.sumoctave for every x,y coordinate
-    for (let y=0; y<height; y++) {
-      for (let x=0; x<width; x++) {
-        let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) //* islandise_round(x,y, width);
-        if (point < 0) {
-          point = 0;
-        }
-        terrain[y][x] = point;
-      }
+  // run perlin.sumoctave for every x,y coordinate
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) * islandise_round(x, y, width);
+      // if (point < 0) {
+      //   point = 0;
+      // }
+      terrain[y][x] = point;
     }
+  }
 
-    return terrain;
+  return terrain;
 }
 
 /**
@@ -61,54 +61,62 @@ export function generateTerrain(noise, width, height, octaves=7, persistence=0.5
  * - run a convolution filter over the array, take the average of points, if close to 0 then add to list
  */
 
-function generate_ports(terrain) {
-    console.log("generating ports...")
+export function generatePorts(terrain) {
+  const ports = []
+  console.log("generating ports...")
 
-    const vertices = terrain.geometry.attributes.position.array;
+  // generate a list of coordinates where y = 1
+  // for (let i = 0; i <= vertices.length; i += 3) {
+  //   if (vertices[i + 2] > 1 && vertices[i + 2] < 2) {
+  //     shore_coords.push([vertices[i], vertices[i + 1], vertices[i + 2]]);
+  //   }
+  // }
+  const shoreCoords = [];
 
-    // generate a list of coordinates where y = 1
-    const shore_coords = [];
-    for (let i=0; i<=vertices.length; i+=3) {
-        if (vertices[i+2] > 1 && vertices[i+2] < 2) {
-            shore_coords.push([vertices[i], vertices[i+1], vertices[i+2]]);
-        }
+  for (let y=0; y<terrain.length; y++) {
+    for (let x=0; x<terrain[0].length; x++) {
+      if (terrain[y][x] > 1 && terrain[y][x] < 2) {
+        shoreCoords.push([x, y])
+      }
     }
+  }
 
-    console.log(shore_coords.length)
+  console.log(shoreCoords.length)
 
-    for (let i=0; i<30; i++) {
+  for (let i = 0; i < 30; i++) {
 
-        // pick a random coordinate from the list
-        const coord = shore_coords[Math.floor(Math.random() * shore_coords.length)];
-        console.log("found", coord);
+    // pick a random coordinate from the list
+    const coord = shoreCoords[Math.floor(Math.random() * shoreCoords.length)];
+    console.log("found", coord);
 
-        // TODO remove picked from list
+    // TODO remove picked from list
 
-        const port = new Port(scene, coord[0], coord[2], -coord[1]);
-        ports.push(port);
-    }
+    ports.push([coord[0], coord[1]]);
+  }
+  
+  return ports
 }
 
 function generate_node_graph() {
-    console.log("calculating pathfinding graph...")
+  console.log("calculating pathfinding graph...")
 
-    const water_verticies = terrain.geometry.attributes.position.array;
-    const water_points = [];
+  const water_verticies = terrain.geometry.attributes.position.array;
+  const water_points = [];
 
-    for (let i=0; i < water_verticies.length; i+=3) {
-        if (water_verticies[i+2] <= 0) {
-            water_points.push([water_verticies[i], water_verticies[i+1], water_verticies[i+2]]);
-        }
+  for (let i = 0; i < water_verticies.length; i += 3) {
+    if (water_verticies[i + 2] <= 0) {
+      water_points.push([water_verticies[i], water_verticies[i + 1], water_verticies[i + 2]]);
     }
+  }
 
-    console.log("water points", water_points.length)
-    return water_points;
+  console.log("water points", water_points.length)
+  return water_points;
 }
 
 /**
  * Iterate through all faces in the mesh, and if the face has all y coords equal to 0, add to list
  */
 function get_water_faces(terrain) {
-    const faces = terrain.geometry.attributes.position.array;
-    console.log(faces.slice(0, 30));
+  const faces = terrain.geometry.attributes.position.array;
+  console.log(faces.slice(0, 30));
 }

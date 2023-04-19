@@ -8,6 +8,9 @@
   - Also need a way to make the island not look completely circularised
 - [ ] make water 3d - don't set to 0, maybe translucent overlay?
 - [ ] switch to typescript
+- [ ] change colour palette
+- [ ] make noise less chaotic - less octaves?
+- [ ] 
 
 ## Resources
 
