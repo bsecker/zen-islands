@@ -7,28 +7,25 @@ const WIDTH = 2048;
 const HEIGHT = 2048;
 
 // create the scene
-const ships = [];
-
 const renderer = new GameRenderer(document, window, WIDTH, HEIGHT);
+
+// generate terrain
 const noise = new SimplexNoise();
-
-
 const terrain = generateTerrain(noise, WIDTH, HEIGHT);
-const ports = generatePorts(terrain, 5);
+
+const ports = generatePorts(terrain, 5, renderer.scene);
 const nav = new NavigationController(terrain, ports);
-// const terrain = [
-//     [1, 2, 3, 2, 1],
-//     [1, 2, 3, 2, 1],
-//     [1, 2, 3, 2, 1],
-//     [1, 2, 3, 2, 1],
-//     [1, 2, 3, 2, 1],
-// ]
+renderer.navController = nav;
 
-// console.table(terrain[0]);
+// kick off ship generation
+ports.forEach(port => {port.createShip()});
 
+
+// add height mesh
 const mesh = renderer.generateMeshFromHeightMap(terrain);
 renderer.scene.add(mesh);
+
 renderer.generatePortMeshes(ports);
-renderer.renderExamplePath(nav.exampleSearch);
+// renderer.renderExamplePath(nav.exampleSearch);
 
 renderer.animate();

@@ -176,17 +176,17 @@ export class GameRenderer {
     })
   }
 
-  renderExamplePath(path) {
-    var points = [];
-    for (let i = 0; i < path.length; i++) {
-      points.push(new THREE.Vector3(path[i].x, 0, path[i].y))
-    }
+  // renderExamplePath(path) {
+  //   var points = [];
+  //   for (let i = 0; i < path.length; i++) {
+  //     points.push(new THREE.Vector3(path[i].x, 0, path[i].y))
+  //   }
 
-    let geometry = new THREE.BufferGeometry().setFromPoints( points );
-    let material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
-    let line = new THREE.Line( geometry, material );
-    this.scene.add( line );
-  }
+  //   let geometry = new THREE.BufferGeometry().setFromPoints( points );
+  //   let material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+  //   let line = new THREE.Line( geometry, material );
+  //   this.scene.add( line );
+  // }
 
   animate() {
 
@@ -195,6 +195,11 @@ export class GameRenderer {
     this.controls.update();
 
     this.renderer.render(this.scene, this.camera);
+
+    // is this pattern ok? strong coupling?
+    if (this.navController) {
+      this.navController.updateShips(this.scene);
+    }
 
     // putting this last so that the program will stop if there's an error rather than continuing to render
     requestAnimationFrame(this.animate.bind(this));

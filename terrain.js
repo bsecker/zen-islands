@@ -63,21 +63,21 @@ export function generateTerrain(noise, width, height, octaves = 5, persistence =
  * - run a convolution filter over the array, take the average of points, if close to 0 then add to list
  */
 
-export function generatePorts(terrain, portNum) {
+export function generatePorts(terrain, portNum, scene) {
   const ports = []
   console.log("generating ports...")
 
   const shoreCoords = [];
 
-  for (let y = 1; y < terrain.length - 1; y++) {
+  for (let z = 1; z < terrain.length - 1; z++) {
     for (let x = 1; x < terrain[0].length - 1; x++) {
 
       // a point is on a shore if at least one of its neighbours is sand (>=1) and it is not sand itself
-      if (terrain[y][x] <= 0 && (terrain[y + 1][x] >=1  ||
-        terrain[y - 1][x] >= 1 ||
-        terrain[y][x + 1] >= 1 ||
-        terrain[y][x - 1] >= 1)) {
-        shoreCoords.push([x, y])
+      if (terrain[z][x] <= 0 && (terrain[z + 1][x] >=1  ||
+        terrain[z - 1][x] >= 1 ||
+        terrain[z][x + 1] >= 1 ||
+        terrain[z][x - 1] >= 1)) {
+        shoreCoords.push([x, z])
       }
     }
   }
@@ -89,7 +89,7 @@ export function generatePorts(terrain, portNum) {
 
     // TODO remove picked from list
 
-    ports.push(new Port(coord[0], coord[1]));
+    ports.push(new Port(scene, coord[0], 0, coord[1]));
   }
 
   console.log(ports);
