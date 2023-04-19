@@ -25,7 +25,7 @@ ports.forEach(port => {port.createShip()});
 const mesh = renderer.generateMeshFromHeightMap(terrain);
 renderer.scene.add(mesh);
 
-renderer.generatePortMeshes(ports);
+// renderer.generatePortMeshes(ports);
 // renderer.renderExamplePath(nav.exampleSearch);
 
 renderer.animate();

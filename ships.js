@@ -17,7 +17,7 @@ export class NavigationController {
           const path = PATH.astar.search(this.graph, portNode, otherPortNode, {
             // heuristic: PATH.astar.heuristics.diagonal
           });
-          if (path.length > 0) console.log("path found: ", path.length, " nodes")
+          if (path.length > 0) console.log("    path found: ", path.length, " nodes")
           port.paths.push(path);
         }
       });
@@ -130,13 +130,19 @@ class Ship {
 }
 
 export class Port {
-  constructor(scene, x, y=0, z) {
+  constructor(scene, x, y=1, z) {
     this.x = x;
     this.y = y;
     this.z = z;
     this.paths = []; // TODO currently set by nav controller constructor, fix this
     this.ships = [];
     this.scene = scene;
+
+    const geometry = new THREE.CylinderGeometry( 20, 20, 20, 32 );
+    const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+    const cylinder = new THREE.Mesh( geometry, material );
+    cylinder.position.set(x, y, z)
+    this.scene.add( cylinder );
   }
 
   get locationString() {

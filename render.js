@@ -166,15 +166,10 @@ export class GameRenderer {
     return mesh;
   }
 
-  generatePortMeshes(ports) {
-    ports.forEach(port => {
-      const geometry = new THREE.CylinderGeometry( 20, 20, 20, 32 );
-      const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
-      const cylinder = new THREE.Mesh( geometry, material );
-      cylinder.position.set(port.x, 1, port.y)
-      this.scene.add( cylinder );
-    })
-  }
+  // generatePortMeshes(ports) {
+  //   ports.forEach(port => {
+  //   })
+  // }
 
   // renderExamplePath(path) {
   //   var points = [];
