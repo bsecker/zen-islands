@@ -20,7 +20,7 @@ export class NavigationController {
     for (let y=0; y<terrain.length; y++) {
       const row = [];
       for (let x=0; x<terrain[0].length; x++) {
-        row.push(this.convertHeightToWait(terrain[y][x]));
+        row.push(this.convertHeightToWeight(terrain[y][x]));
       }
       converted.push(row);
     }
@@ -38,7 +38,7 @@ export class NavigationController {
    * - if weight is > 1, return 0 (land)
    * @param {*} height 
    */
-  convertHeightToWait(height) {
+  convertHeightToWeight(height) {
     
     const maxWeight = 10;
 
@@ -46,11 +46,8 @@ export class NavigationController {
     if (height >= 0) {
       return 0; 
     } 
-   
     // prefer deeper water
-    else {
-      return 1 + (maxWeight / Math.abs(height));
-    }
+    return 1 + (maxWeight / Math.abs(height));
   }
 }
 
