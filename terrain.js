@@ -1,3 +1,5 @@
+import { Port } from "./ships";
+
 export function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
@@ -36,7 +38,7 @@ function islandise_round(x, y, width) {
 
 
 
-export function generateTerrain(noise, width, height, octaves = 7, persistence = 0.501, scale = 0.0008, low = -300, high = 300) {
+export function generateTerrain(noise, width, height, octaves = 5, persistence = 0.501, scale = 0.0008, low = -300, high = 300) {
   console.log("generating terrain...")
 
   // fill empty array
@@ -45,7 +47,7 @@ export function generateTerrain(noise, width, height, octaves = 7, persistence =
   // run perlin.sumoctave for every x,y coordinate
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) * islandise_round(x, y, width);
+      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) // * islandise_round(x, y, width);
       // if (point < 0) {
       //   point = 0;
       // }
@@ -61,62 +63,36 @@ export function generateTerrain(noise, width, height, octaves = 7, persistence =
  * - run a convolution filter over the array, take the average of points, if close to 0 then add to list
  */
 
-export function generatePorts(terrain) {
+export function generatePorts(terrain, portNum) {
   const ports = []
   console.log("generating ports...")
 
-  // generate a list of coordinates where y = 1
-  // for (let i = 0; i <= vertices.length; i += 3) {
-  //   if (vertices[i + 2] > 1 && vertices[i + 2] < 2) {
-  //     shore_coords.push([vertices[i], vertices[i + 1], vertices[i + 2]]);
-  //   }
-  // }
   const shoreCoords = [];
 
-  for (let y=0; y<terrain.length; y++) {
-    for (let x=0; x<terrain[0].length; x++) {
-      if (terrain[y][x] > 1 && terrain[y][x] < 2) {
+  for (let y = 1; y < terrain.length - 1; y++) {
+    for (let x = 1; x < terrain[0].length - 1; x++) {
+
+      // a point is on a shore if at least one of its neighbours is sand (>=1) and it is not sand itself
+      if (terrain[y][x] >= 1 && (terrain[y + 1][x] < 0 ||
+        terrain[y - 1][x] < 0 ||
+        terrain[y][x + 1] < 0 ||
+        terrain[y][x - 1] < 0)) {
         shoreCoords.push([x, y])
       }
     }
   }
 
-  console.log(shoreCoords.length)
-
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < portNum; i++) {
 
     // pick a random coordinate from the list
     const coord = shoreCoords[Math.floor(Math.random() * shoreCoords.length)];
-    console.log("found", coord);
 
     // TODO remove picked from list
 
-    ports.push([coord[0], coord[1]]);
+    ports.push(new Port(coord[0], coord[1]));
   }
-  
+
+  console.log(ports);
+
   return ports
-}
-
-function generate_node_graph() {
-  console.log("calculating pathfinding graph...")
-
-  const water_verticies = terrain.geometry.attributes.position.array;
-  const water_points = [];
-
-  for (let i = 0; i < water_verticies.length; i += 3) {
-    if (water_verticies[i + 2] <= 0) {
-      water_points.push([water_verticies[i], water_verticies[i + 1], water_verticies[i + 2]]);
-    }
-  }
-
-  console.log("water points", water_points.length)
-  return water_points;
-}
-
-/**
- * Iterate through all faces in the mesh, and if the face has all y coords equal to 0, add to list
- */
-function get_water_faces(terrain) {
-  const faces = terrain.geometry.attributes.position.array;
-  console.log(faces.slice(0, 30));
 }

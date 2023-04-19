@@ -3,10 +3,12 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export class GameRenderer {
-  constructor(document, window) {
+  constructor(document, window, mapWidth, mapHeight) {
     this.scene = new THREE.Scene();
     this.camera = this.createCamera();
     this.light = this.createLighting();
+    this.mapWidth = mapWidth;
+    this.mapHeight = mapHeight;
 
     // create the renderer
     this.renderer = new THREE.WebGLRenderer();
@@ -19,21 +21,23 @@ export class GameRenderer {
     // this.scene.add(this.createLargeSea());
 
     // TODO
-    // window.onresize = function() {
-    //   this.renderer.setSize(window.innerWidth, window.innerHeight);
-    //   camera.aspect = window.innerWidth / window.innerHeight;
-    //   camera.updateProjectionMatrix();
-    // } 
+    window.onresize = function() {
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+    }.bind(this);
   }
 
   createCamera() {
     // create the camera
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
     // camera.position.z = 5;
-    camera.position.y = 2000;
-    camera.position.z = 100;
-    camera.rotation.x = -25 * Math.PI / 180;
-
+    camera.position.x = 1000;
+    camera.position.y = 1000;
+    camera.position.z = 1000;
+    // camera.translateOnAxis(new THREE.Vector3(1, 1, 1), 0.5 * this.mapWidth);
+    // camera.translateX(0.5 * this.mapWidth);
+    // camera.translateZ(0.5 * this.mapHeight);
     return camera;
   }
 
@@ -69,9 +73,11 @@ export class GameRenderer {
   getColor(height) {
     let color = 0x000000;
     switch (true) {
+      case height < -100: color = 0x0000cc; break; // deeper water
+      case height < -10: color = 0x0000e2; break; // deep water
       case height < 1: color = 0x0000ff; break; // water 
       case height < 10: color = 0x505050; break; // sand
-      case height < 100: color = 0x074709; break // grass
+      case height < 100: color = 0x074709; break; // grass
       case height < 150: color = 0x295e2b; break; // darker grass
       case height < 170: color = 0x697f6a; break; // dirt
       default: color = 0xffffff; // snow
@@ -165,7 +171,7 @@ export class GameRenderer {
       const geometry = new THREE.CylinderGeometry( 20, 20, 20, 32 );
       const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
       const cylinder = new THREE.Mesh( geometry, material );
-      cylinder.position.set(port[0], 1, port[1])
+      cylinder.position.set(port.x, 1, port.y)
       this.scene.add( cylinder );
     })
   }

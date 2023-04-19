@@ -2,12 +2,41 @@ import * as THREE from 'three';
 import * as PATH from './pathfinding'
 
 export class NavigationController {
-  constructor(terrain) {
+  constructor(terrain, ports) {
     this.graph = new PATH.Graph(this.convertTerrainWeights(terrain), { diagonal: true});
-    this.start = this.graph.grid[0][0];
-    this.end = this.graph.grid[4095][4095]
-    this.exampleSearch = PATH.astar.search(this.graph, this.start, this.end);
+    this.ports = ports;
+
+    const startport = this.ports[0];
+    this.start = this.graph.grid[startport.x][startport.y];
+    
+    // choose random end port
+    const endport = this.ports[Math.floor(Math.random() * this.ports.length)];
+    this.end = this.graph.grid[endport.x][endport.y];
+
+    console.log("start: ", this.start, "end: ", this.end);
+
+    console.log("finding path...")
+    this.exampleSearch = PATH.astar.search(this.graph, this.start, this.end, {
+      // heuristic: PATH.astar.heuristics.diagonal
+    });
     console.log(this.exampleSearch);
+
+    this.ports.forEach(port => {
+      const portNode = this.graph.grid[port.x][port.y];
+      port.paths = [];
+      this.ports.forEach(otherPort => {
+        if (otherPort !== port) {
+          const otherPortNode = this.graph.grid[otherPort.x][otherPort.y];
+          console.log("pathfinding between ", port.locationString, " and ", otherPort.locationString, "...")
+          const path = PATH.astar.search(this.graph, portNode, otherPortNode, {
+            // heuristic: PATH.astar.heuristics.diagonal
+          });
+          if (path.length > 0) console.log("path found: ", path.length, " nodes")
+          port.paths.push(path);
+        }
+      });
+    });
+
   }
 
   /**
@@ -20,7 +49,7 @@ export class NavigationController {
     for (let y=0; y<terrain.length; y++) {
       const row = [];
       for (let x=0; x<terrain[0].length; x++) {
-        row.push(this.convertHeightToWeight(terrain[y][x]));
+        row.push(this.convertHeightToWeight(terrain[x][y]));
       }
       converted.push(row);
     }
@@ -40,14 +69,14 @@ export class NavigationController {
    */
   convertHeightToWeight(height) {
     
-    const maxWeight = 10;
+    const maxWeight = 1;
 
     // islands are walls
-    if (height >= 0) {
+    if (height >= 1) {
       return 0; 
     } 
     // prefer deeper water
-    return 1 + (maxWeight / Math.abs(height));
+    return 1 + Math.abs(height) * 0.05;
   }
 }
 
@@ -74,10 +103,21 @@ class Ship {
 }
 
 export class Port {
-  constructor(x, y, z) {
+  constructor(x, y, z=0) {
     this.x = x;
     this.y = y;
     this.z = z;
   }
 
+  get locationString() {
+    return `${this.x},${this.y},${this.z}`;
+  }
+}
+
+class Channel {
+  constructor(end1, end2, points) {
+    this.end1 = end1;
+    this.end2 = end2;
+    this.points = points;
+  }
 }
