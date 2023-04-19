@@ -8,17 +8,23 @@ export class NavigationController {
 
     // pathfind between all ports
     this.ports.forEach(port => {
-      const portNode = this.graph.grid[port.x][port.y];
+      const portNode = this.graph.grid[port.x][port.z];
       port.paths = [];
       this.ports.forEach(otherPort => {
         if (otherPort !== port) {
-          const otherPortNode = this.graph.grid[otherPort.x][otherPort.y];
+          
+          // try find a path between port and other with A* algorithm
+          const otherPortNode = this.graph.grid[otherPort.x][otherPort.z];
           console.log("pathfinding between ", port.locationString, " and ", otherPort.locationString, "...")
           const path = PATH.astar.search(this.graph, portNode, otherPortNode, {
             // heuristic: PATH.astar.heuristics.diagonal
           });
-          if (path.length > 0) console.log("    path found: ", path.length, " nodes")
-          port.paths.push(path);
+
+          // path found, add to paths
+          if (path.length > 0) {
+            console.log("    path found: ", path.length, " nodes")
+            port.paths.push(path);
+          }
         }
       });
     });
@@ -101,6 +107,7 @@ class Ship {
     this.y = y;
     this.z = z;
     this.path = path;
+    this.index = 0;
 
     this.orientation = 0;
     this.velocity = new THREE.Vector3(0, 0, 0);
@@ -118,14 +125,17 @@ class Ship {
   }
 
   update() {
-    if (this.health <=0) {
-      this.alive = false
-      console.log("dead", this.x, this.y);
-      return
+    if (this.index < this.path.length) {
+      this.x = this.path[this.index].x;
+      this.z = this.path[this.index].y;
+      this.cube.position.set(this.x, this.y, this.z)
+      this.index++
+      return;
     }
-    this.health--;
-    this.x--;
-    this.cube.position.set(this.x, this.y, this.z)
+
+    // reached end, so kill
+    this.alive = false
+     console.log("dead", this.x, this.y);
   }
 }
 
@@ -150,6 +160,9 @@ export class Port {
   }
 
   createShip() {
+    // don't do anything if the port has no paths
+    if (this.paths.length == 0) return;
+
     // create ship with a random path
     const ship = new Ship(this.scene, this.x, this.y, this.z, this.paths[Math.floor(Math.random() * this.paths.length)]);
     console.log("created ship at port", this.locationString, "following path", ship.path.length, "nodes long");
