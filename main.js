@@ -12,8 +12,9 @@ const renderer = new GameRenderer(document, window, WIDTH, HEIGHT);
 // generate terrain
 const noise = new SimplexNoise();
 const terrain = generateTerrain(noise, WIDTH, HEIGHT);
+console.table(terrain.slice(0, 10))
 
-const ports = generatePorts(terrain, 5, renderer.scene);
+const ports = generatePorts(terrain, 3, renderer.scene);
 const nav = new NavigationController(terrain, ports);
 renderer.navController = nav;
 

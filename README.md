@@ -9,8 +9,8 @@
 - [ ] make water 3d - don't set to 0, maybe translucent overlay?
 - [ ] switch to typescript
 - [ ] change colour palette
-- [ ] make noise less chaotic - less octaves?
-- [ ] 
+- [x] make noise less chaotic - less octaves?
+- [ ] use perkin noise to add subtle biomes
 
 ## Resources
 

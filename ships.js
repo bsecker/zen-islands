@@ -3,7 +3,9 @@ import * as PATH from './pathfinding'
 
 export class NavigationController {
   constructor(terrain, ports) {
-    this.graph = new PATH.Graph(this.convertTerrainWeights(terrain), { diagonal: true});
+    const weightedGraph = this.convertTerrainWeights(terrain);
+    // console.table(weightedGraph.slice(0, 10));
+    this.graph = new PATH.Graph(weightedGraph, { diagonal: false});
     this.ports = ports;
 
     // pathfind between all ports
@@ -17,7 +19,7 @@ export class NavigationController {
           const otherPortNode = this.graph.grid[otherPort.x][otherPort.z];
           console.log("pathfinding between ", port.locationString, " and ", otherPort.locationString, "...")
           const path = PATH.astar.search(this.graph, portNode, otherPortNode, {
-            // heuristic: PATH.astar.heuristics.diagonal
+            heuristic: PATH.astar.heuristics.diagonal
           });
 
           // path found, add to paths
@@ -84,7 +86,7 @@ export class NavigationController {
    * - if weight is > 1, return 0 (land)
    * @param {*} height 
    */
-  convertHeightToWeight(height) {
+  convertHeightToWeight(height, heightmin=30, heightmax=1) {
     
     const maxWeight = 1;
 
@@ -92,13 +94,25 @@ export class NavigationController {
     if (height >= 1) {
       return 0; 
     } 
+
+    // map height between heightmin and heightmax
+    // Y = (X-A)/(B-A) * (D-C) + C
+    // height = Math.abs(height);
+    // height = (height - 1)/299 * (heightmax-heightmin) + 1
+
     // prefer deeper water
-    return 1 + Math.abs(height) * 0.05;
+    // switch(true) {
+    //   case height < 50: return 1;
+    //   case height < 20: return 2;
+    //   case height < 10: return 3;
+    //   case height < 0: return 4;
+    //   default: return 1
+    // }
+    return 1 + 1 / Math.abs(height * 0.25) //+ (1 / Math.abs(height) * 0.5);
+
+    
   }
 }
-
-// TODO figure out how how the coordinate systems of THREE.js works.
-// AFAICT - y is up. z = depth
 
 class Ship {
   constructor(scene, x, y, z, path) {
@@ -113,9 +127,10 @@ class Ship {
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.alive = true;
     this.health = 100;
+    this.tempspeed = 1 + Math.floor(Math.random() * 2);
 
     // TODO change to triangle
-    const geometry = new THREE.BoxGeometry(20, 20, 20);
+    const geometry = new THREE.BoxGeometry(10, 10, 10);
     const material = new THREE.MeshBasicMaterial({
       color: 0xffff00
     });
@@ -129,7 +144,7 @@ class Ship {
       this.x = this.path[this.index].x;
       this.z = this.path[this.index].y;
       this.cube.position.set(this.x, this.y, this.z)
-      this.index++
+      this.index+=this.tempspeed
       return;
     }
 
@@ -169,7 +184,7 @@ export class Port {
     setTimeout(() => {
       this.ships.push(ship);
       this.createShip();
-    }, Math.random() * 10000);
+    }, Math.random() * 20000);
   }
 
   update() {

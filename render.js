@@ -20,6 +20,15 @@ export class GameRenderer {
     // add sea
     // this.scene.add(this.createLargeSea());
 
+    const watergeometry = new THREE.PlaneGeometry(mapWidth, mapHeight);
+    const watermaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff, side: THREE.DoubleSide, opacity: 0.55, transparent: true });
+    watermaterial.alph
+    const water = new THREE.Mesh(watergeometry, watermaterial);
+    water.position.set(0.5 * mapWidth, 0, 0.5 * mapHeight);
+    water.rotation.x = -Math.PI / 2;
+    // water.position.y = 10;
+    this.scene.add(water);
+
     // TODO
     window.onresize = function() {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -45,6 +54,7 @@ export class GameRenderer {
     // Orbit camera
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
     controls.enableDamping = true;
+    controls.target = new THREE.Vector3(this.mapWidth/2,0,this.mapHeight/2)
     controls.minZoom = 10;
     controls.mouseButtons = {
       RIGHT: THREE.MOUSE.ROTATE,
@@ -68,19 +78,28 @@ export class GameRenderer {
     // this.scene.background = new THREE.Color('#0000FF')
     this.scene.fog = new THREE.Fog(0xFFFFFF, 5000, 10000)
     return light;
+
+
   }
 
-  getColor(height) {
+  getColor(height, minHeight=-300, maxHeight=300) {
+    
+    const waterHeight = (height, minHeight) => new THREE.Color().setHSL(0.631, 1, (Math.abs(minHeight) - Math.abs(height))/Math.abs(minHeight)*0.2).getHex();
+
+    // const heightHSL = (height, hue, sat, min) => new THREE.Color().setHSL(hue, sat, (Math.abs(min) - Math.abs(height))/Math.abs(min)*0.3).getHex();
+
     let color = 0x000000;
     switch (true) {
-      case height < -100: color = 0x0000cc; break; // deeper water
-      case height < -10: color = 0x0000e2; break; // deep water
-      case height < 1: color = 0x0000ff; break; // water 
+      // case height < -100: color = 0x00001f; break; // deepest water
+      // case height < -50: color = 0x00001c; break; // deeper water
+      // case height < -10: color = 0x00005c; break; // deep water
+      case height < 1: color = waterHeight(height, minHeight); break; // water 
       case height < 10: color = 0x505050; break; // sand
-      case height < 100: color = 0x074709; break; // grass
-      case height < 150: color = 0x295e2b; break; // darker grass
-      case height < 170: color = 0x697f6a; break; // dirt
-      default: color = 0xffffff; // snow
+      // case height < 170: color = heightHSL(height, 0.4, 0.5, maxHeight); break;
+      // case height < 100: color = 0x074709; break; // grass
+      // case height < 150: color = 0x295e2b; break; // darker grass
+      // case height < 170: color = 0x697f6a; break; // dirt
+      default: color = new THREE.Color().setHSL(0.30, 0.678, 0.1 + 0.3*(height/maxHeight)).getHex();
     }
 
     return color;
@@ -114,7 +133,7 @@ export class GameRenderer {
         const height = heightmap[y][x];
         const index = ((y * mapHeight) + x) * 3;
         vertices[index] = x // - (0.5 * mapHeight);
-        vertices[index + 1] = Math.max(height, 0);
+        vertices[index + 1] = height // Math.max(height, 0);
         vertices[index + 2] = y // - (0.5 * mapWidth);
       }
     }
@@ -201,13 +220,3 @@ export class GameRenderer {
 
   }
 }
-
-// // create water mesh
-// if (RENDER_WATER) {
-//     const watergeometry = new THREE.PlaneGeometry(WIDTH, HEIGHT);
-//     const watermaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide });
-//     const water = new THREE.Mesh(watergeometry, watermaterial);
-//     water.rotation.x = -Math.PI / 2;
-//     water.position.y = 10;
-//     scene.add(water);
-// }
