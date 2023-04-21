@@ -29,7 +29,18 @@ export class GameRenderer {
     // water.position.y = 10;
     this.scene.add(water);
 
-    // TODO
+    // add snowglobe
+    // const spheregeometry = new THREE.SphereGeometry(mapWidth/2, 20, 20);
+    // const spherematerial = new THREE.MeshLambertMaterial({
+    //   color: 0xffffff,
+    //   side: THREE.DoubleSide,
+    //   opacity: 0.25,
+    //   transparent: true
+    // })
+    // const sphere = new THREE.Mesh(spheregeometry, spherematerial);
+    // sphere.position.set(mapWidth/2, 0, mapHeight/2);
+    // this.scene.add(sphere);
+
     window.onresize = function() {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.camera.aspect = window.innerWidth / window.innerHeight;

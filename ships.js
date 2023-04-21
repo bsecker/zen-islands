@@ -117,17 +117,19 @@ export class NavigationController {
 class Ship {
   constructor(scene, x, y, z, path) {
     this.scene = scene;
-    this.x = x;
-    this.y = y;
-    this.z = z;
     this.path = path;
-    this.index = 0;
+    this.targetIndex = 0;
 
     this.orientation = 0;
-    this.velocity = new THREE.Vector3(0, 0, 0);
+
+    this.position = new THREE.Vector3(x,y,z);
+    this.velocity = new THREE.Vector3(0,0,0);
+    this.accel = new THREE.Vector3(0,0,0);
+
     this.alive = true;
-    this.health = 100;
-    this.tempspeed = 1 + Math.floor(Math.random() * 2);
+    this.targetMoveSpeed = 1 + Math.floor(Math.random() * 2);
+    this.maxSpeed = 1;
+    this.maxForce = 0.2;
 
     // TODO change to triangle
     const geometry = new THREE.BoxGeometry(10, 10, 10);
@@ -140,17 +142,57 @@ class Ship {
   }
 
   update() {
-    if (this.index < this.path.length) {
-      this.x = this.path[this.index].x;
-      this.z = this.path[this.index].y;
-      this.cube.position.set(this.x, this.y, this.z)
-      this.index+=this.tempspeed
+
+    // console.log(this.position, this.velocity, this.accel)
+
+    if (this.targetIndex >= this.path.length) {
+      // reached end, so kill
+      this.alive = false
+      console.log("dead", this.position.x, this.position.y);
       return;
     }
 
-    // reached end, so kill
-    this.alive = false
-     console.log("dead", this.x, this.y);
+    // this.position.x = this.path[this.target].x;
+    // this.position.z = this.path[this.target].y;
+
+    const target = new THREE.Vector3(this.path[this.targetIndex].x, 0, this.path[this.targetIndex].y);
+
+    // const desired = target.sub(this.position);
+    const desired = new THREE.Vector3().subVectors(target, this.position);
+    desired.normalize()
+    desired.multiplyScalar(this.maxSpeed);
+
+    const steer = new THREE.Vector3().subVectors(desired, this.velocity);
+
+    steer.clampLength(0, this.maxForce); // TODO or is it clampScalar?
+    
+    // apply force
+    this.accel.add(steer);
+
+    // Update velocity
+    this.velocity.add(this.accel);
+    // Limit speed
+    this.velocity.clampLength(0, this.maxSpeed);
+    this.position.add(this.velocity);
+    // Reset acceleration to 0 each cycle
+    this.accel.multiplyScalar(0);
+
+    // update graphics to match
+    this.cube.position.set(this.position.x, this.position.y, this.position.z);
+    // this.cube.lookAt(this.velocity);
+
+    this.targetIndex+=this.targetMoveSpeed
+
+  }
+
+  get x() {
+    return this.position.x;
+  }
+  get y() {
+    return this.position.y;
+  }
+  get z() {
+    return this.position.z;
   }
 }
 
@@ -181,10 +223,11 @@ export class Port {
     // create ship with a random path
     const ship = new Ship(this.scene, this.x, this.y, this.z, this.paths[Math.floor(Math.random() * this.paths.length)]);
     console.log("created ship at port", this.locationString, "following path", ship.path.length, "nodes long");
+    this.ships.push(ship);
+
     setTimeout(() => {
-      this.ships.push(ship);
       this.createShip();
-    }, Math.random() * 20000);
+    }, Math.random() * 30000);
   }
 
   update() {

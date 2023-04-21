@@ -73,10 +73,10 @@ export function generatePorts(terrain, portNum, scene) {
     for (let x = 1; x < terrain[0].length - 1; x++) {
 
       // a point is on a shore if at least one of its neighbours is sand (>=1) and it is not sand itself
-      if (terrain[z][x] <= 0 && (terrain[z + 1][x] >=1  ||
-        terrain[z - 1][x] >= 1 ||
-        terrain[z][x + 1] >= 1 ||
-        terrain[z][x - 1] >= 1)) {
+      if (terrain[z][x] < 0 && (terrain[z + 1][x] >=0  ||
+        terrain[z - 1][x] >= 0 ||
+        terrain[z][x + 1] >= 0 ||
+        terrain[z][x - 1] >= 0)) {
         shoreCoords.push([x, z])
       }
     }
