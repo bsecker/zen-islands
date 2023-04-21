@@ -1,3 +1,4 @@
+// @ts-ignore
 import { SimplexNoise } from './noise'
 import { GameRenderer } from './render';
 import { generateTerrain, generatePorts } from './terrain';

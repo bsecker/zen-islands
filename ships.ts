@@ -1,8 +1,18 @@
 import * as THREE from 'three';
+import { Scene } from 'three';
+// @ts-ignore
 import * as PATH from './pathfinding'
 
+interface GridNode {
+  x: number;
+  y: number;
+}
+
 export class NavigationController {
-  constructor(terrain, ports) {
+  ports: Port[];
+  graph: any;
+
+  constructor(terrain: number[][], ports: Port[]) {
     const weightedGraph = this.convertTerrainWeights(terrain);
     // console.table(weightedGraph.slice(0, 10));
     this.graph = new PATH.Graph(weightedGraph, { diagonal: false});
@@ -41,7 +51,7 @@ export class NavigationController {
   /**
    * Update ships in all ports, and delete ships when they're finished their path
    */
-  updateShips(scene) {
+  updateShips(scene: Scene) {
     this.ports.forEach(port => {
       
       // if one of the ships is dead, filter the list to just alive after updating all ships.
@@ -62,7 +72,7 @@ export class NavigationController {
    * Given a 2d array of weights, convert to something the pathfinding library understands.
    * @param {*} terrain 
    */
-  convertTerrainWeights(terrain) {
+  convertTerrainWeights(terrain: number[][]) {
     console.log("converting pathfinding weights...")
     const converted = [];
     for (let y=0; y<terrain.length; y++) {
@@ -86,7 +96,7 @@ export class NavigationController {
    * - if weight is > 1, return 0 (land)
    * @param {*} height 
    */
-  convertHeightToWeight(height, heightmin=30, heightmax=1) {
+  convertHeightToWeight(height: number, heightmin=30, heightmax=1) {
     
     const maxWeight = 1;
 
@@ -115,7 +125,19 @@ export class NavigationController {
 }
 
 class Ship {
-  constructor(scene, x, y, z, path) {
+  scene: any;
+  path: any;
+  targetIndex: number;
+  orientation: number;
+  position: THREE.Vector3;
+  velocity: THREE.Vector3;
+  accel: THREE.Vector3;
+  alive: boolean;
+  targetMoveSpeed: number;
+  maxSpeed: number;
+  maxForce: number;
+  cube: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
+  constructor(scene: Scene, x: number, y: number, z: number, path: GridNode[]) {
     this.scene = scene;
     this.path = path;
     this.targetIndex = 0;
@@ -197,7 +219,13 @@ class Ship {
 }
 
 export class Port {
-  constructor(scene, x, y=1, z) {
+  x: number;
+  y: number;
+  z: number;
+  paths: GridNode[][];
+  ships: Ship[];
+  scene: THREE.Scene;
+  constructor(scene: Scene, x: number, y=1, z: number) {
     this.x = x;
     this.y = y;
     this.z = z;

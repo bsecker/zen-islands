@@ -1,6 +1,7 @@
+import { Scene } from "three";
 import { Port } from "./ships";
 
-export function distance(x1, y1, x2, y2) {
+export function distance(x1: number, y1: number, x2: number, y2: number) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
@@ -9,7 +10,7 @@ export function distance(x1, y1, x2, y2) {
  * @param {*} x 
  * @param {*} y 
  */
-function islandise_round(x, y, width) {
+function islandise_round(x: number, y: number, width: number) {
   const dist = distance(width / 2, width / 2, x, y);
   const maxDist = width / 2;
   // if distance is larger than the max distance, scale it back to 0 quicker
@@ -38,11 +39,11 @@ function islandise_round(x, y, width) {
 
 
 
-export function generateTerrain(noise, width, height, octaves = 5, persistence = 0.501, scale = 0.0008, low = -300, high = 300) {
+export function generateTerrain(noise: any, width: number, height: number, octaves = 5, persistence = 0.501, scale = 0.0008, low = -300, high = 300) {
   console.log("generating terrain...")
 
   // fill empty array
-  const terrain = Array(height).fill().map(() => Array(width).fill(0));
+  const terrain = Array(height).fill([]).map(() => Array(width).fill(0));
 
   // run perlin.sumoctave for every x,y coordinate
   for (let y = 0; y < height; y++) {
@@ -63,7 +64,7 @@ export function generateTerrain(noise, width, height, octaves = 5, persistence =
  * - run a convolution filter over the array, take the average of points, if close to 0 then add to list
  */
 
-export function generatePorts(terrain, portNum, scene) {
+export function generatePorts(terrain: number[][], portNum: number, scene: Scene) {
   const ports = []
   console.log("generating ports...")
 

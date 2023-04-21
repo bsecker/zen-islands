@@ -1,9 +1,19 @@
 // Rendering code
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { NavigationController } from './ships';
 
 export class GameRenderer {
-  constructor(document, window, mapWidth, mapHeight) {
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
+  light: THREE.DirectionalLight;
+  mapWidth: number;
+  mapHeight: number;
+  renderer: THREE.WebGLRenderer;
+  controls: OrbitControls;
+  navController: NavigationController | undefined; // set after constructor - code smell. Is there any way to fix this?
+  
+  constructor(document: Document, window: Window, mapWidth: number, mapHeight: number) {
     this.scene = new THREE.Scene();
     this.camera = this.createCamera();
     this.light = this.createLighting();
@@ -15,14 +25,13 @@ export class GameRenderer {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
 
-    this.controls = this.createOrbitControls(this.camera, this.renderer);
+    this.controls = this.createOrbitControls();
 
     // add sea
     // this.scene.add(this.createLargeSea());
 
     const watergeometry = new THREE.PlaneGeometry(mapWidth, mapHeight);
     const watermaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff, side: THREE.DoubleSide, opacity: 0.55, transparent: true });
-    watermaterial.alph
     const water = new THREE.Mesh(watergeometry, watermaterial);
     water.position.set(0.5 * mapWidth, 0, 0.5 * mapHeight);
     water.rotation.x = -Math.PI / 2;
@@ -41,11 +50,11 @@ export class GameRenderer {
     // sphere.position.set(mapWidth/2, 0, mapHeight/2);
     // this.scene.add(sphere);
 
-    window.onresize = function() {
+    window.onresize = () => {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
-    }.bind(this);
+    };
   }
 
   createCamera() {
@@ -93,9 +102,9 @@ export class GameRenderer {
 
   }
 
-  getColor(height, minHeight=-300, maxHeight=300) {
+  getColor(height: number, minHeight=-300, maxHeight=300) {
     
-    const waterHeight = (height, minHeight) => new THREE.Color().setHSL(0.631, 1, (Math.abs(minHeight) - Math.abs(height))/Math.abs(minHeight)*0.2).getHex();
+    const waterHeight = (height: number, minHeight: number) => new THREE.Color().setHSL(0.631, 1, (Math.abs(minHeight) - Math.abs(height))/Math.abs(minHeight)*0.2).getHex();
 
     // const heightHSL = (height, hue, sat, min) => new THREE.Color().setHSL(hue, sat, (Math.abs(min) - Math.abs(height))/Math.abs(min)*0.3).getHex();
 
@@ -128,7 +137,7 @@ export class GameRenderer {
     return plane;
   }
 
-  generateMeshFromHeightMap(heightmap) {
+  generateMeshFromHeightMap(heightmap: number[][]) {
     const geometry = new THREE.BufferGeometry();
     const material = new THREE.MeshLambertMaterial({ color: 0xffffff, vertexColors: true });
     const mapWidth = heightmap[0].length;
