@@ -6,11 +6,13 @@
 - [ ] improve islandiser so outsides aren't just sandbars.
   - Custom curve? start shallow (so can have lots of mountainous in middle), get steep at end?
   - Also need a way to make the island not look completely circularised
-- [ ] make water 3d - don't set to 0, maybe translucent overlay?
+- [x] make water 3d - don't set to 0, maybe translucent overlay?
 - [ ] switch to typescript
 - [ ] change colour palette
 - [x] make noise less chaotic - less octaves?
-- [ ] use perkin noise to add subtle biomes
+- [ ] use perlin noise to add subtle biomes
+- [x] change boats to triangles
+- [ ] run each ship in it's own thread, or do pathfinding in seperate thread?
 
 ## Resources
 

@@ -15,7 +15,7 @@ export class NavigationController {
   constructor(terrain: number[][], ports: Port[]) {
     const weightedGraph = this.convertTerrainWeights(terrain);
     // console.table(weightedGraph.slice(0, 10));
-    this.graph = new PATH.Graph(weightedGraph, { diagonal: false});
+    this.graph = new PATH.Graph(weightedGraph, { diagonal: true});
     this.ports = ports;
 
     // pathfind between all ports
@@ -118,15 +118,16 @@ export class NavigationController {
     //   case height < 0: return 4;
     //   default: return 1
     // }
-    return 1 + 1 / Math.abs(height * 0.25) //+ (1 / Math.abs(height) * 0.5);
+    const weight = 1 + 1 / Math.abs(height * 0.25) //+ (1 / Math.abs(height) * 0.5);
 
+    return weight > 30 ? 30 : weight;
     
   }
 }
 
 class Ship {
-  scene: any;
-  path: any;
+  scene: Scene;
+  path: GridNode[];
   targetIndex: number;
   orientation: number;
   position: THREE.Vector3;
@@ -137,7 +138,7 @@ class Ship {
   maxSpeed: number;
   maxForce: number;
   cube: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
-  constructor(scene: Scene, x: number, y: number, z: number, path: GridNode[]) {
+  constructor(scene: Scene, x: number, y: number, z: number, path: GridNode[], color = 0xffff00) {
     this.scene = scene;
     this.path = path;
     this.targetIndex = 0;
@@ -149,17 +150,21 @@ class Ship {
     this.accel = new THREE.Vector3(0,0,0);
 
     this.alive = true;
-    this.targetMoveSpeed = 1 + Math.floor(Math.random() * 2);
-    this.maxSpeed = 1;
-    this.maxForce = 0.2;
+    this.targetMoveSpeed = 1; 
+    this.maxSpeed = 0.7;
+    this.maxForce = 0.03;
 
     // TODO change to triangle
     const geometry = new THREE.BoxGeometry(10, 10, 10);
+    // const geometry = new THREE.ConeGeometry(10, 20, 7);
+    geometry.rotateZ(Math.PI/2);
+    geometry.rotateY(Math.PI/2);
     const material = new THREE.MeshBasicMaterial({
-      color: 0xffff00
+      color: color
     });
     this.cube = new THREE.Mesh(geometry, material);
     this.cube.position.set(x, y, z);
+    // this.cube.rotation.y = (Math.PI/2);
     this.scene.add(this.cube);
   }
 
@@ -167,11 +172,14 @@ class Ship {
 
     // console.log(this.position, this.velocity, this.accel)
 
-    if (this.targetIndex >= this.path.length) {
-      // reached end, so kill
-      this.alive = false
-      console.log("dead", this.position.x, this.position.y);
-      return;
+    // reached end, so kill 
+    if (this.targetIndex >= this.path.length-this.targetMoveSpeed) {
+      // only kill if the physical location of the boat is close to the end of the path
+      if (this.position.distanceTo(new THREE.Vector3(this.path[this.path.length-this.targetMoveSpeed].x, 0, this.path[this.path.length-this.targetMoveSpeed].y)) < 5) {
+        this.alive = false
+        console.log("dead", this.position.x, this.position.y);
+        return;
+      }
     }
 
     // this.position.x = this.path[this.target].x;
@@ -201,9 +209,12 @@ class Ship {
 
     // update graphics to match
     this.cube.position.set(this.position.x, this.position.y, this.position.z);
-    // this.cube.lookAt(this.velocity);
+    this.cube.lookAt(this.position.add(this.velocity));
+    // this.cube.rotateY()
 
-    this.targetIndex+=this.targetMoveSpeed
+    if (this.targetIndex < this.path.length-this.targetMoveSpeed) {
+      this.targetIndex+=this.targetMoveSpeed
+    }
 
   }
 

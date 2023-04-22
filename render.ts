@@ -39,9 +39,10 @@ export class GameRenderer {
     this.scene.add(water);
 
     // add snowglobe
-    // const spheregeometry = new THREE.SphereGeometry(mapWidth/2, 20, 20);
+    // const spheregeometry = new THREE.SphereGeometry(mapWidth/2, 20, 20, 0, Math.PI*2,);
+    // // const spheregeometry = new THREE.
     // const spherematerial = new THREE.MeshLambertMaterial({
-    //   color: 0xffffff,
+    //   color: 0x0000ff,
     //   side: THREE.DoubleSide,
     //   opacity: 0.25,
     //   transparent: true
