@@ -154,8 +154,7 @@ class Ship {
     this.maxSpeed = 0.7;
     this.maxForce = 0.03;
 
-    // TODO change to triangle
-    const geometry = new THREE.BoxGeometry(10, 10, 10);
+    const geometry = new THREE.BoxGeometry(10, 20, 10);
     // const geometry = new THREE.ConeGeometry(10, 20, 7);
     geometry.rotateZ(Math.PI/2);
     geometry.rotateY(Math.PI/2);
@@ -266,7 +265,7 @@ export class Port {
 
     setTimeout(() => {
       this.createShip();
-    }, Math.random() * 30000);
+    }, Math.random() * 60_000);
   }
 
   update() {

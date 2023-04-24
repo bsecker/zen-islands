@@ -16,7 +16,7 @@ export class GameRenderer {
   constructor(document: Document, window: Window, mapWidth: number, mapHeight: number) {
     this.scene = new THREE.Scene();
     this.camera = this.createCamera();
-    this.light = this.createLighting();
+    this.light = this.createLighting(document);
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
 
@@ -75,18 +75,23 @@ export class GameRenderer {
     // Orbit camera
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
     controls.enableDamping = true;
+    controls.dampingFactor = 0.2;
     controls.target = new THREE.Vector3(this.mapWidth/2,0,this.mapHeight/2)
-    controls.minZoom = 10;
+    controls.maxDistance = 1750;
+    controls.minDistance = 50;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.6; 
+    controls.maxPolarAngle = (Math.PI/2)*0.95; // prevent <0 vertical
     controls.mouseButtons = {
       RIGHT: THREE.MOUSE.ROTATE,
       MIDDLE: THREE.MOUSE.DOLLY,
-      LEFT: THREE.MOUSE.PAN
+      LEFT: undefined // THREE.MOUSE.PAN // prevent
     }
     controls.update();
     return controls;
   }
 
-  createLighting() {
+  createLighting(document: Document) {
     // create a basic lighting setup
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     this.scene.add(ambientLight);
@@ -95,9 +100,38 @@ export class GameRenderer {
     // light.position.set(0, 1000, 0)
     this.scene.add(light);
 
+    // hemisphere light & sky
+    const hemisphereLight = new THREE.HemisphereLight(0x0bb5e0, 0x0b4be0);
+    this.scene.add(hemisphereLight);
+
+    const vertexShader = document.getElementById( 'vertexShader' )!.textContent || undefined;
+    const fragmentShader = document.getElementById( 'fragmentShader' )!.textContent || undefined;
+    const uniforms = {
+      'topColor': { value: new THREE.Color( 0xffffff ) },
+      // 'bottomColor': { value: new THREE.Color( 0xffffff ) },
+      'bottomColor': { value: new THREE.Color( 0x0000ff ) },
+      'offset': { value: 33 },
+      'exponent': { value: 0.3 }
+    };
+    uniforms[ 'topColor' ].value.copy( hemisphereLight.color );
+
+
+    const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
+    const skyMat = new THREE.ShaderMaterial( {
+      uniforms: uniforms,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      side: THREE.BackSide
+    } );
+
+    const sky = new THREE.Mesh( skyGeo, skyMat );
+    sky.position.set(1024,0,1024);
+    this.scene.add( sky );
+
     // background and fog
     // this.scene.background = new THREE.Color('#0000FF')
-    this.scene.fog = new THREE.Fog(0xFFFFFF, 5000, 10000)
+    // this.scene.fog = new THREE.Fog(0xFFFFFF, 5000, 10000)
+    // this.scene.fog.color.copy( uniforms[ 'bottomColor' ].value );
     return light;
 
 
@@ -115,6 +149,7 @@ export class GameRenderer {
       // case height < -50: color = 0x00001c; break; // deeper water
       // case height < -10: color = 0x00005c; break; // deep water
       case height < 1: color = waterHeight(height, minHeight); break; // water 
+      // case height < 1: color = 0x0000ff; break;
       case height < 10: color = 0x505050; break; // sand
       // case height < 170: color = heightHSL(height, 0.4, 0.5, maxHeight); break;
       // case height < 100: color = 0x074709; break; // grass

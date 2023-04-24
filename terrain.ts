@@ -25,17 +25,30 @@ function islandise_round(x: number, y: number, width: number) {
 /**
  * given a set of coords (x,y), apply a square mask to the coords so that the edges are lower than the center
  */
-// function islandise_square(x,y) {
-//     const distance_x = Math.abs(-x);
-//     const distance_y = Math.abs(-y);
+function islandiseSquare(x: number,y: number, mapWidth: number, low: number, high: number) {
+    const max_width = (mapWidth * 0.5);
 
-//     const distance = Math.max(distance_x, distance_y);
-//     const max_width = (WIDTH * 0.5);
-//     const delta = distance / max_width;
-//     const gradient = delta * delta;
+    const distance_x = Math.abs(max_width-x);
+    const distance_y = Math.abs(max_width-y);
 
-//     return Math.max(0, 1.0-gradient);
-// }
+    const distance = Math.max(distance_x, distance_y);
+
+    const range = high - low;
+    const rangeValue = range * (distance / (mapWidth));
+
+    // Return the range value plus the minimum value
+    let val = low + rangeValue;
+
+    return val;
+
+    // unfinished attempt to make edges drop off daster
+    // return distance > (mapWidth-100) ? val-100: val
+
+    // const delta = distance / max_width;
+    // const gradient = delta * delta;
+
+    // return Math.max(low,1-gradient);
+}
 
 
 
@@ -48,10 +61,8 @@ export function generateTerrain(noise: any, width: number, height: number, octav
   // run perlin.sumoctave for every x,y coordinate
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) // * islandise_round(x, y, width);
-      // if (point < 0) {
-      //   point = 0;
-      // }
+      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) - islandiseSquare(x, y, width, 0, 300);
+      // round out edges
       terrain[y][x] = point;
     }
   }
