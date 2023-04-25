@@ -154,7 +154,7 @@ class Ship {
     this.maxSpeed = 0.7;
     this.maxForce = 0.03;
 
-    const geometry = new THREE.BoxGeometry(10, 20, 10);
+    const geometry = new THREE.BoxGeometry(13, 23, 13);
     // const geometry = new THREE.ConeGeometry(10, 20, 7);
     geometry.rotateZ(Math.PI/2);
     geometry.rotateY(Math.PI/2);
@@ -259,7 +259,8 @@ export class Port {
     if (this.paths.length == 0) return;
 
     // create ship with a random path
-    const ship = new Ship(this.scene, this.x, this.y, this.z, this.paths[Math.floor(Math.random() * this.paths.length)]);
+    const shipColor = new THREE.Color().setHSL(Math.random(), 1, 0.5).getHex();
+    const ship = new Ship(this.scene, this.x, this.y, this.z, this.paths[Math.floor(Math.random() * this.paths.length)], shipColor);
     console.log("created ship at port", this.locationString, "following path", ship.path.length, "nodes long");
     this.ships.push(ship);
 

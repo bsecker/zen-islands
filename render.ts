@@ -80,7 +80,7 @@ export class GameRenderer {
     controls.maxDistance = 1750;
     controls.minDistance = 50;
     controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.6; 
+    controls.autoRotateSpeed = 0.4; 
     controls.maxPolarAngle = (Math.PI/2)*0.95; // prevent <0 vertical
     controls.mouseButtons = {
       RIGHT: THREE.MOUSE.ROTATE,
@@ -116,7 +116,7 @@ export class GameRenderer {
     uniforms[ 'topColor' ].value.copy( hemisphereLight.color );
 
 
-    const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
+    const skyGeo = new THREE.SphereGeometry( 8000, 32, 15 );
     const skyMat = new THREE.ShaderMaterial( {
       uniforms: uniforms,
       vertexShader: vertexShader,

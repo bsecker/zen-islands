@@ -4,8 +4,8 @@ import { GameRenderer } from './render';
 import { generateTerrain, generatePorts } from './terrain';
 import { NavigationController } from './ships';
 
-const WIDTH = 2048;
-const HEIGHT = 2048;
+const WIDTH = 4096;
+const HEIGHT = 4096;
 
 // create the scene
 const renderer = new GameRenderer(document, window, WIDTH, HEIGHT);
@@ -15,7 +15,7 @@ const noise = new SimplexNoise();
 const terrain = generateTerrain(noise, WIDTH, HEIGHT);
 console.table(terrain.slice(0, 10))
 
-const ports = generatePorts(terrain, 4, renderer.scene);
+const ports = generatePorts(terrain, 6, renderer.scene);
 const nav = new NavigationController(terrain, ports);
 renderer.navController = nav;
 

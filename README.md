@@ -24,6 +24,11 @@ Terrain gen
 - https://shanee.io/blog/2015/09/25/procedural-island-generation/
 - 
 
+
+## Running
+
+`npx vite`
+
 Manual terrain testing
 
 `node -r esm heightmap.js`
