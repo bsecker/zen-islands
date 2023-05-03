@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { NavigationController } from './ships';
+import { GUI } from 'dat.gui'
 
 export class GameRenderer {
   scene: THREE.Scene;
@@ -11,14 +12,41 @@ export class GameRenderer {
   mapHeight: number;
   renderer: THREE.WebGLRenderer;
   controls: OrbitControls;
+  gui: GUI;
+  sky: THREE.Mesh;
   navController: NavigationController | undefined; // set after constructor - code smell. Is there any way to fix this?
+
+  waterOverlay: THREE.Mesh;
+  params: {
+    waterOverlayColor: string,
+    waterOverlayOpacity: number,
+    waterHue: number,
+    cameraRotate: boolean,
+    skyColor: number,
+    backgroundWaterColor: number,
+    skyOffset: number,
+    skyExponent: number,
+  }
   
   constructor(document: Document, window: Window, mapWidth: number, mapHeight: number) {
+    this.params = {
+      waterOverlayColor: '#373a53',
+      waterOverlayOpacity: 0.5,
+      waterHue: 0.527,
+      cameraRotate: true,
+      skyColor: 0x43b6f2,
+      backgroundWaterColor: 0xebbfb6,
+      skyOffset: 1329,
+      skyExponent: 0.54,
+    }
+
     this.scene = new THREE.Scene();
     this.camera = this.createCamera();
-    this.light = this.createLighting(document);
+    this.light = this.createLighting();
+    this.sky = this.createSky(document);
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
+
 
     // create the renderer
     this.renderer = new THREE.WebGLRenderer();
@@ -26,17 +54,37 @@ export class GameRenderer {
     document.body.appendChild(this.renderer.domElement);
 
     this.controls = this.createOrbitControls();
+    
+    this.waterOverlay = this.createSea(mapWidth, mapHeight);
 
-    // add sea
-    // this.scene.add(this.createLargeSea());
+    // controls
+    this.gui = new GUI();
+    this.gui.addFolder("Colors")
+    this.gui.addColor(this.params, 'waterOverlayColor').onChange((value) => {
+      this.waterOverlay.material.color.set(value);
+    });
+    this.gui.add(this.params, 'waterOverlayOpacity', 0, 1).onChange((value) => {
+      this.waterOverlay.material.opacity = value;
+    });
+    this.gui.addColor(this.params, 'skyColor').onChange((value) => {
+      this.sky.material.uniforms.topColor.value.set(value);
+    });
+    this.gui.addColor(this.params, 'backgroundWaterColor').onChange((value) => {
+      this.sky.material.uniforms.bottomColor.value.set(value);
+    });
+    this.gui.add(this.params, 'skyOffset', -2000, 2000).onChange((value) => {
+      this.sky.material.uniforms.offset.value = value;
+    });
+    this.gui.add(this.params, 'skyExponent', 0, 1).onChange((value) => {
+      this.sky.material.uniforms.exponent.value = value;
+    });
+    this.gui.addFolder('Camera');
+    this.gui.add(this.params, 'cameraRotate').onChange((value) => {
+      this.controls.autoRotate = value;
+    });
+    this.gui.open();
 
-    const watergeometry = new THREE.PlaneGeometry(mapWidth, mapHeight);
-    const watermaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff, side: THREE.DoubleSide, opacity: 0.55, transparent: true });
-    const water = new THREE.Mesh(watergeometry, watermaterial);
-    water.position.set(0.5 * mapWidth, 0, 0.5 * mapHeight);
-    water.rotation.x = -Math.PI / 2;
-    // water.position.y = 10;
-    this.scene.add(water);
+    // sky.material.uniforms[ 'topColor' ]
 
     // add snowglobe
     // const spheregeometry = new THREE.SphereGeometry(mapWidth/2, 20, 20, 0, Math.PI*2,);
@@ -58,9 +106,20 @@ export class GameRenderer {
     };
   }
 
-  createCamera() {
+  private createSea(mapWidth: number, mapHeight: number) {
+    const watergeometry = new THREE.PlaneGeometry(mapWidth, mapHeight);
+    const watermaterial = new THREE.MeshLambertMaterial({ color: 0x1890A8, side: THREE.DoubleSide, opacity: 0.55, transparent: true });
+    const water = new THREE.Mesh(watergeometry, watermaterial);
+    water.position.set(0.5 * mapWidth, 0, 0.5 * mapHeight);
+    water.rotation.x = -Math.PI / 2;
+    // water.position.y = 10;
+    this.scene.add(water);
+    return water;
+  }
+
+  private createCamera() {
     // create the camera
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 15000);
     // camera.position.z = 5;
     camera.position.x = 1000;
     camera.position.y = 1000;
@@ -71,7 +130,7 @@ export class GameRenderer {
     return camera;
   }
 
-  createOrbitControls() {
+  private createOrbitControls() {
     // Orbit camera
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
     controls.enableDamping = true;
@@ -81,7 +140,7 @@ export class GameRenderer {
     controls.minDistance = 50;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.4; 
-    controls.maxPolarAngle = (Math.PI/2)*0.95; // prevent <0 vertical
+    // controls.maxPolarAngle = (Math.PI/2)*0.95; // prevent <0 vertical
     controls.mouseButtons = {
       RIGHT: THREE.MOUSE.ROTATE,
       MIDDLE: THREE.MOUSE.DOLLY,
@@ -91,15 +150,7 @@ export class GameRenderer {
     return controls;
   }
 
-  createLighting(document: Document) {
-    // create a basic lighting setup
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-    this.scene.add(ambientLight);
-    const light = new THREE.DirectionalLight(0xffffff, 2.3);
-    // light.position.set(this.camera.position.x, this.camera.position.y + 500, this.camera.position.z + 500).normalize();
-    // light.position.set(0, 1000, 0)
-    this.scene.add(light);
-
+  private createSky(document: Document) {
     // hemisphere light & sky
     const hemisphereLight = new THREE.HemisphereLight(0x0bb5e0, 0x0b4be0);
     this.scene.add(hemisphereLight);
@@ -107,11 +158,11 @@ export class GameRenderer {
     const vertexShader = document.getElementById( 'vertexShader' )!.textContent || undefined;
     const fragmentShader = document.getElementById( 'fragmentShader' )!.textContent || undefined;
     const uniforms = {
-      'topColor': { value: new THREE.Color( 0xffffff ) },
+      'topColor': { value: new THREE.Color(this.params.skyColor) },
       // 'bottomColor': { value: new THREE.Color( 0xffffff ) },
-      'bottomColor': { value: new THREE.Color( 0x0000ff ) },
-      'offset': { value: 33 },
-      'exponent': { value: 0.3 }
+      'bottomColor': { value: new THREE.Color( this.params.backgroundWaterColor ) },
+      'offset': { value: this.params.skyOffset },
+      'exponent': { value: this.params.skyExponent }
     };
     uniforms[ 'topColor' ].value.copy( hemisphereLight.color );
 
@@ -125,11 +176,25 @@ export class GameRenderer {
     } );
 
     const sky = new THREE.Mesh( skyGeo, skyMat );
+    console.log("mapWidth", this.mapWidth, "mapHeight", this.mapHeight);
+    // TODO: figure out why this is undefined
+    // sky.position.set(this.mapWidth/2,0,this.mapHeight/2);
     sky.position.set(1024,0,1024);
     this.scene.add( sky );
+    return sky;
+  }
+
+  private createLighting() {
+    // create a basic lighting setup
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    this.scene.add(ambientLight);
+    const light = new THREE.DirectionalLight(0xffffff, 2.3);
+    // light.position.set(this.camera.position.x, this.camera.position.y + 500, this.camera.position.z + 500).normalize();
+    // light.position.set(0, 1000, 0)
+    this.scene.add(light);
 
     // background and fog
-    // this.scene.background = new THREE.Color('#0000FF')
+    this.scene.background = new THREE.Color('#0000FF')
     // this.scene.fog = new THREE.Fog(0xFFFFFF, 5000, 10000)
     // this.scene.fog.color.copy( uniforms[ 'bottomColor' ].value );
     return light;
@@ -137,9 +202,10 @@ export class GameRenderer {
 
   }
 
-  getColor(height: number, minHeight=-300, maxHeight=300) {
+  private getColor(height: number, minHeight=-300, maxHeight=300) {
     
-    const waterHeight = (height: number, minHeight: number) => new THREE.Color().setHSL(0.631, 1, (Math.abs(minHeight) - Math.abs(height))/Math.abs(minHeight)*0.2).getHex();
+    // 
+    const waterHeight = (height: number, minHeight: number) => new THREE.Color().setHSL(this.params.waterHue, 0.75, (Math.abs(minHeight) - Math.abs(height))/Math.abs(minHeight)*0.2).getHex();
 
     // const heightHSL = (height, hue, sat, min) => new THREE.Color().setHSL(hue, sat, (Math.abs(min) - Math.abs(height))/Math.abs(min)*0.3).getHex();
 
@@ -150,12 +216,12 @@ export class GameRenderer {
       // case height < -10: color = 0x00005c; break; // deep water
       case height < 1: color = waterHeight(height, minHeight); break; // water 
       // case height < 1: color = 0x0000ff; break;
-      case height < 10: color = 0x505050; break; // sand
+      case height < 10: color = 0xefe097; break; // sand
       // case height < 170: color = heightHSL(height, 0.4, 0.5, maxHeight); break;
       // case height < 100: color = 0x074709; break; // grass
       // case height < 150: color = 0x295e2b; break; // darker grass
       // case height < 170: color = 0x697f6a; break; // dirt
-      default: color = new THREE.Color().setHSL(0.30, 0.678, 0.1 + 0.3*(height/maxHeight)).getHex();
+      default: color = new THREE.Color().setHSL(0.336, 0.678, 0.1 + 0.3*(height/maxHeight)).getHex();
     }
 
     return color;
@@ -164,9 +230,9 @@ export class GameRenderer {
   /**
    * Generate a very large horizontal blue plane to represent the sea
    */
-  createLargeSea() {
+  private createLargeSea() {
     const geometry = new THREE.PlaneGeometry(10000, 10000);
-    const material = new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide });
+    const material = new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.FrontSide });
     const plane = new THREE.Mesh(geometry, material);
     plane.rotation.x = Math.PI / 2;
 
@@ -189,7 +255,7 @@ export class GameRenderer {
         const height = heightmap[y][x];
         const index = ((y * mapHeight) + x) * 3;
         vertices[index] = x // - (0.5 * mapHeight);
-        vertices[index + 1] = height // Math.max(height, 0);
+        vertices[index + 1] = height //Math.max(height, 0);
         vertices[index + 2] = y // - (0.5 * mapWidth);
       }
     }

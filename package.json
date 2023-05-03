@@ -3,7 +3,9 @@
     "three": "^0.151.3"
   },
   "devDependencies": {
+    "@types/dat.gui": "^0.7.9",
     "@types/three": "^0.150.2",
+    "dat.gui": "^0.7.9",
     "esm": "^3.2.25",
     "sharp": "^0.32.0",
     "typescript": "^5.0.4",

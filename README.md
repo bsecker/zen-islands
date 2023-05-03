@@ -13,6 +13,10 @@
 - [ ] use perlin noise to add subtle biomes
 - [x] change boats to triangles
 - [ ] run each ship in it's own thread, or do pathfinding in seperate thread?
+- [ ] fix x/y getting screwed up - only notice when map is not square
+- [ ] add interactive buttons to regenerate (and do on timer), stop movement, create ships etc
+- [ ] Make outside look pretty
+- [ ] host on website
 
 ## Resources
 

@@ -13,10 +13,13 @@ export class NavigationController {
   graph: any;
 
   constructor(terrain: number[][], ports: Port[]) {
-    const weightedGraph = this.convertTerrainWeights(terrain);
-    // console.table(weightedGraph.slice(0, 10));
-    this.graph = new PATH.Graph(weightedGraph, { diagonal: true});
     this.ports = ports;
+
+    // don't do any processing if there aren't any ports.
+    if (ports.length <= 0) return; 
+
+    const weightedGraph = this.convertTerrainWeights(terrain); // console.table(weightedGraph.slice(0, 10));
+    this.graph = new PATH.Graph(weightedGraph, { diagonal: true});
 
     // pathfind between all ports
     this.ports.forEach(port => {
