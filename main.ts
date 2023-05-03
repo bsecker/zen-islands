@@ -6,7 +6,7 @@ import { NavigationController } from './ships';
 
 const WIDTH  = 2048;
 const HEIGHT = 2048;
-const PORTS = 0;
+const PORTS = 3;
 
 // create the scene
 const renderer = new GameRenderer(document, window, WIDTH, HEIGHT);
