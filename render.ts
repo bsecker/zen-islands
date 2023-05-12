@@ -121,9 +121,9 @@ export class GameRenderer {
     // create the camera
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 15000);
     // camera.position.z = 5;
-    camera.position.x = 1000;
-    camera.position.y = 1000;
-    camera.position.z = 1000;
+    // camera.position.x = 1000;
+    camera.position.y = 700;
+    // camera.position.z = 1000;
     // camera.translateOnAxis(new THREE.Vector3(1, 1, 1), 0.5 * this.mapWidth);
     // camera.translateX(0.5 * this.mapWidth);
     // camera.translateZ(0.5 * this.mapHeight);
@@ -140,7 +140,7 @@ export class GameRenderer {
     controls.minDistance = 50;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.4; 
-    // controls.maxPolarAngle = (Math.PI/2)*0.95; // prevent <0 vertical
+    controls.maxPolarAngle = (Math.PI/2)*0.95; // prevent <0 vertical
     controls.mouseButtons = {
       RIGHT: THREE.MOUSE.ROTATE,
       MIDDLE: THREE.MOUSE.DOLLY,

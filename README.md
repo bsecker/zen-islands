@@ -14,15 +14,16 @@ I started this project to simultaneously learn 3D rendering basics and also to p
 - [c] switch to typescript
 - [c] change colour palette
 - [x] make noise less chaotic - less octaves?
-- [ ] use perlin noise to add subtle biomes
 - [x] change boats to triangles
 - [ ] run each ship in it's own thread, or do pathfinding in seperate thread?
 - [ ] fix x/y getting screwed up - only notice when map is not square
 - [ ] Make background look prettier, figure out a way to blend the mesh so it doesn't look like it's a floating rectangle
+- [ ] fix timer pausing when moving away from the page
 - [ ] host demo on website
 
 ## Stretch Goals
 
+- [ ] use perlin noise to add subtle biomes
 - [ ] add interactive buttons to regenerate (and do on timer), stop movement, create ships etc
 - [ ] Add seed to noise generator
 - [ ] add random names to large land-masses
