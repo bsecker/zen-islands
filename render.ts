@@ -18,7 +18,7 @@ export class GameRenderer {
 
   waterOverlay: THREE.Mesh;
   params: {
-    waterOverlayColor: string,
+    waterOverlayColor: number,
     waterOverlayOpacity: number,
     waterHue: number,
     cameraRotate: boolean,
@@ -30,14 +30,14 @@ export class GameRenderer {
   
   constructor(document: Document, window: Window, mapWidth: number, mapHeight: number) {
     this.params = {
-      waterOverlayColor: '#373a53',
+      waterOverlayColor: 0x123350,
       waterOverlayOpacity: 0.5,
       waterHue: 0.527,
       cameraRotate: true,
-      skyColor: 0x43b6f2,
-      backgroundWaterColor: 0xebbfb6,
-      skyOffset: 1329,
-      skyExponent: 0.54,
+      skyColor: 0x245b72,
+      backgroundWaterColor: 0x1b1b1b,
+      skyOffset: 766,
+      skyExponent: 1,
     }
 
     this.scene = new THREE.Scene();
@@ -108,7 +108,7 @@ export class GameRenderer {
 
   private createSea(mapWidth: number, mapHeight: number) {
     const watergeometry = new THREE.PlaneGeometry(mapWidth, mapHeight);
-    const watermaterial = new THREE.MeshLambertMaterial({ color: 0x1890A8, side: THREE.DoubleSide, opacity: 0.55, transparent: true });
+    const watermaterial = new THREE.MeshLambertMaterial({ color: this.params.waterOverlayColor, side: THREE.DoubleSide, opacity: 0.55, transparent: true });
     const water = new THREE.Mesh(watergeometry, watermaterial);
     water.position.set(0.5 * mapWidth, 0, 0.5 * mapHeight);
     water.rotation.x = -Math.PI / 2;
@@ -119,7 +119,7 @@ export class GameRenderer {
 
   private createCamera() {
     // create the camera
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 15000);
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 15000);
     // camera.position.z = 5;
     // camera.position.x = 1000;
     camera.position.y = 700;
@@ -158,13 +158,13 @@ export class GameRenderer {
     const vertexShader = document.getElementById( 'vertexShader' )!.textContent || undefined;
     const fragmentShader = document.getElementById( 'fragmentShader' )!.textContent || undefined;
     const uniforms = {
-      'topColor': { value: new THREE.Color(this.params.skyColor) },
+      'topColor': { value: new THREE.Color(this.params.skyColor)},
       // 'bottomColor': { value: new THREE.Color( 0xffffff ) },
       'bottomColor': { value: new THREE.Color( this.params.backgroundWaterColor ) },
       'offset': { value: this.params.skyOffset },
       'exponent': { value: this.params.skyExponent }
     };
-    uniforms[ 'topColor' ].value.copy( hemisphereLight.color );
+    // uniforms[ 'topColor' ].value.copy( hemisphereLight.color );
 
 
     const skyGeo = new THREE.SphereGeometry( 8000, 32, 15 );

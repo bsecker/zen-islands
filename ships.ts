@@ -14,13 +14,48 @@ export class NavigationController {
 
   constructor(terrain: number[][], ports: Port[]) {
     this.ports = ports;
-
+    
     // don't do any processing if there aren't any ports.
     if (ports.length <= 0) return; 
 
     const weightedGraph = this.convertTerrainWeights(terrain); // console.table(weightedGraph.slice(0, 10));
     this.graph = new PATH.Graph(weightedGraph, { diagonal: true});
 
+    // // find all permutations of ports
+    // const permutations = [];
+    // for (let i=0; i<ports.length; i++) {
+    //   for (let j=0; j<ports.length; j++) {
+    //     if (i !== j) {
+    //       permutations.push([ports[i], ports[j]]);
+    //     }
+    //   }
+    // }
+
+    // console.log("permutations: ", permutations)
+
+    // // reduce to unique permutations - no point in pathfinding between A and B, and B and A
+    // // Also, at the same time, reduce permutations to grid points rather than whole Port objects
+    // const uniquePermutations: number[][] = [];
+    // permutations.forEach(permutation => {
+    //   const reverse = [permutation[1], permutation[0]];
+    //   if (!uniquePermutations.find((p: any) => p[0] === reverse[0] && p[1] === reverse[1])) {
+    //     uniquePermutations.push([permutation[0].x, permutation[0].z, permutation[1].x, permutation[1].z]);
+    //   }
+    // });
+
+    // // asyncronously pathfind between all ports
+    // console.log("unique permutations: ", uniquePermutations);
+    // const parallel = new Parallel(uniquePermutations, {
+    //   // @ts-ignore
+    //   env: {
+    //     graph: this.graph
+    //   }
+    // });
+    
+    // parallel
+    //   .map((permutation: number[]) => search(global.env.graph, global.env.graph.grid[permutation[0]][permutation[1]], global.env.graph.grid[permutation[2]][permutation[3]]))
+    //   .then(results => { console.log('pathfinding results:', results) });
+    
     // pathfind between all ports
     this.ports.forEach(port => {
       const portNode = this.graph.grid[port.x][port.z];
@@ -44,11 +79,19 @@ export class NavigationController {
       });
     });
 
+
     // kick off initial ship generation at the same time
     // TODO change this in the future to not start at the same time if it looks weird
     // this.ports.forEach(port => {
     //   port.createShip(scene);
     // });
+  }
+
+  search(graph: any, start: GridNode, end: GridNode) {
+    console.log("pathfinding between ", start, " and ", end, "...")
+    return PATH.astar.search(graph, start, end, {
+      heuristic: PATH.astar.heuristics.diagonal
+    });
   }
 
   /**

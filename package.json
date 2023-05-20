@@ -1,9 +1,12 @@
 {
   "dependencies": {
+    "paralleljs": "^1.1.0",
     "three": "^0.151.3"
   },
   "devDependencies": {
     "@types/dat.gui": "^0.7.9",
+    "@types/node": "^20.1.7",
+    "@types/paralleljs": "^0.0.21",
     "@types/three": "^0.150.2",
     "dat.gui": "^0.7.9",
     "esm": "^3.2.25",
