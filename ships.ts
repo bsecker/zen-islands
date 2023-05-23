@@ -2,6 +2,17 @@ import * as THREE from 'three';
 import { Scene } from 'three';
 // @ts-ignore
 import * as PATH from './pathfinding'
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const loader = new OBJLoader();
+let shipModel: THREE.Object3D;
+loader.load('ship-model.obj', (object: any) => {
+  shipModel = (object as THREE.Object3D);
+  shipModel.scale.set(0.1, 0.1, 0.1);
+  shipModel.children[0].rotation.set(-Math.PI/2, 0, 0);
+  console.log("loaded ship model: ", object);
+});
 
 interface GridNode {
   x: number;
@@ -183,7 +194,7 @@ class Ship {
   targetMoveSpeed: number;
   maxSpeed: number;
   maxForce: number;
-  cube: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
+  cube: THREE.Object3D; // THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   constructor(scene: Scene, x: number, y: number, z: number, path: GridNode[], color = 0xffff00) {
     this.scene = scene;
     this.path = path;
@@ -198,19 +209,9 @@ class Ship {
     this.alive = true;
     this.targetMoveSpeed = 1; 
     this.maxSpeed = 0.7;
-    this.maxForce = 0.03;
+    this.maxForce = 0.025;
 
-    const geometry = new THREE.BoxGeometry(13, 23, 13);
-    // const geometry = new THREE.ConeGeometry(10, 20, 7);
-    geometry.rotateZ(Math.PI/2);
-    geometry.rotateY(Math.PI/2);
-    const material = new THREE.MeshBasicMaterial({
-      color: color
-    });
-    this.cube = new THREE.Mesh(geometry, material);
-    this.cube.position.set(x, y, z);
-    // this.cube.rotation.y = (Math.PI/2);
-    this.scene.add(this.cube);
+    this.cube = addShipModel(this.scene, x, y, z, color);
   }
 
   update() {
@@ -230,7 +231,7 @@ class Ship {
     // this.position.x = this.path[this.target].x;
     // this.position.z = this.path[this.target].y;
 
-    const target = new THREE.Vector3(this.path[this.targetIndex].x, 0, this.path[this.targetIndex].y);
+    const target = new THREE.Vector3(this.path[this.targetIndex].x, this.y, this.path[this.targetIndex].y);
 
     // const desired = target.sub(this.position);
     const desired = new THREE.Vector3().subVectors(target, this.position);
@@ -289,8 +290,8 @@ export class Port {
     this.ships = [];
     this.scene = scene;
 
-    const geometry = new THREE.CylinderGeometry( 20, 20, 20, 32 );
-    const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+    const geometry = new THREE.CylinderGeometry( 10, 10, 10, 32 );
+    const material = new THREE.MeshBasicMaterial( {color: 0xb52426} );
     const cylinder = new THREE.Mesh( geometry, material );
     cylinder.position.set(x, y, z)
     this.scene.add( cylinder );
@@ -304,11 +305,15 @@ export class Port {
     // don't do anything if the port has no paths
     if (this.paths.length == 0) return;
 
-    // create ship with a random path
-    const shipColor = new THREE.Color().setHSL(Math.random(), 1, 0.5).getHex();
-    const ship = new Ship(this.scene, this.x, this.y, this.z, this.paths[Math.floor(Math.random() * this.paths.length)], shipColor);
-    console.log("created ship at port", this.locationString, "following path", ship.path.length, "nodes long");
-    this.ships.push(ship);
+    // skip making ships if the ship model hasn't loaded yet
+    if (shipModel) {
+
+      // create ship with a random path
+      const shipColor = new THREE.Color().setHSL(Math.random(), 1, 0.5).getHex();
+      const ship = new Ship(this.scene, this.x, this.y-3, this.z, this.paths[Math.floor(Math.random() * this.paths.length)], shipColor);
+      console.log("created ship at port", this.locationString, "following path", ship.path.length, "nodes long");
+      this.ships.push(ship);
+    }
 
     setTimeout(() => {
       this.createShip();
@@ -321,11 +326,22 @@ export class Port {
   }
 }
 
-// potential optomisation for a future version which means we don't have to pathfind between two ports twice
-// class Channel {
-//   constructor(end1, end2, points) {
-//     this.end1 = end1;
-//     this.end2 = end2;
-//     this.points = points;
-//   }
-// }
+function addShipModel(scene: Scene, x: number, y: number, z: number, color: number) {
+  // Clone the loaded model to create a new instance
+  const modelInstance = shipModel.clone();
+
+  // Set position
+  modelInstance.position.set(x, y, z);
+
+  // Clone and set material
+  const material = (modelInstance.children[0].material as THREE.MeshStandardMaterial).clone();
+  material.color.setHex(color);
+  material.needsUpdate = true;
+
+  modelInstance.children[0].material = material;
+
+  // Add the model instance to the scene
+  scene.add(modelInstance);
+  
+  return modelInstance;
+}

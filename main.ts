@@ -4,8 +4,8 @@ import { GameRenderer } from './render';
 import { generateTerrain, generatePorts } from './terrain';
 import { NavigationController } from './ships';
 
-const WIDTH  = 2048;
-const HEIGHT = 2048;
+const WIDTH  = 1024;
+const HEIGHT = 1024;
 const PORTS = 4;
 
 // create the scene

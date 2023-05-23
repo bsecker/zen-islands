@@ -61,28 +61,34 @@ export class GameRenderer {
     this.gui = new GUI();
     this.gui.addFolder("Colors")
     this.gui.addColor(this.params, 'waterOverlayColor').onChange((value) => {
+      // @ts-ignore
       this.waterOverlay.material.color.set(value);
     });
     this.gui.add(this.params, 'waterOverlayOpacity', 0, 1).onChange((value) => {
+      // @ts-ignore
       this.waterOverlay.material.opacity = value;
     });
     this.gui.addColor(this.params, 'skyColor').onChange((value) => {
+      // @ts-ignore
       this.sky.material.uniforms.topColor.value.set(value);
     });
     this.gui.addColor(this.params, 'backgroundWaterColor').onChange((value) => {
+      // @ts-ignore
       this.sky.material.uniforms.bottomColor.value.set(value);
     });
     this.gui.add(this.params, 'skyOffset', -2000, 2000).onChange((value) => {
+      // @ts-ignore
       this.sky.material.uniforms.offset.value = value;
     });
     this.gui.add(this.params, 'skyExponent', 0, 1).onChange((value) => {
+      // @ts-ignore
       this.sky.material.uniforms.exponent.value = value;
     });
     this.gui.addFolder('Camera');
     this.gui.add(this.params, 'cameraRotate').onChange((value) => {
       this.controls.autoRotate = value;
     });
-    this.gui.open();
+    this.gui.close();
 
     // sky.material.uniforms[ 'topColor' ]
 
@@ -144,7 +150,8 @@ export class GameRenderer {
     controls.mouseButtons = {
       RIGHT: THREE.MOUSE.ROTATE,
       MIDDLE: THREE.MOUSE.DOLLY,
-      LEFT: undefined // THREE.MOUSE.PAN // prevent
+      LEFT: THREE.MOUSE.ROTATE
+      // LEFT: undefined // THREE.MOUSE.PAN // prevent
     }
     controls.update();
     return controls;

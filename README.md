@@ -38,6 +38,7 @@ I started this project to simultaneously learn 3D rendering basics and also to p
 - https://shanee.io/blog/2015/09/25/procedural-island-generation/
 - https://natureofcode.com/book/chapter-6-autonomous-agents/
 - https://chat.openai.com/
+- ship models were created with Sketchup
 
 
 ## Running

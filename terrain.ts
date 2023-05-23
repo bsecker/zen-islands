@@ -52,7 +52,7 @@ function islandiseSquare(x: number,y: number, mapWidth: number, low: number, hig
 
 
 
-export function generateTerrain(noise: any, width: number, height: number, octaves = 5, persistence = 0.501, scale = 0.0008, low = -300, high = 300) {
+export function generateTerrain(noise: any, width: number, height: number, octaves = 6, persistence = 0.501, scale = 0.0008, low = -150, high = 250) {
   console.log("generating terrain...")
 
   // fill empty array
