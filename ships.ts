@@ -177,7 +177,7 @@ export class NavigationController {
     // }
     const weight = 1 + 1 / Math.abs(height * 0.25) //+ (1 / Math.abs(height) * 0.5);
 
-    return weight > 30 ? 30 : weight;
+    return weight > 20 ? 20 : weight;
     
   }
 }
@@ -209,7 +209,7 @@ class Ship {
     this.alive = true;
     this.targetMoveSpeed = 1; 
     this.maxSpeed = 0.7;
-    this.maxForce = 0.025;
+    this.maxForce = 0.03;
 
     this.cube = addShipModel(this.scene, x, y, z, color);
   }

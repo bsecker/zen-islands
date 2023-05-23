@@ -20,6 +20,7 @@ I started this project to simultaneously learn 3D rendering basics and also to p
 - [ ] Make background look prettier, figure out a way to blend the mesh so it doesn't look like it's a floating rectangle
 - [ ] fix timer pausing when moving away from the page
 - [ ] host demo on website
+- [ ] change pathfinding for boats to follow a path rather than just gravitating towards a moving point
 
 ## Stretch Goals
 

@@ -20,8 +20,8 @@ const ports = generatePorts(terrain, PORTS, renderer.scene);
 const nav = new NavigationController(terrain, ports);
 renderer.navController = nav;
 
-// kick off ship generation
-ports.forEach(port => {port.createShip()});
+// kick off ship generation after some time
+ports.forEach(port => {setTimeout(() => port.createShip(), Math.random() * 10000)});
 
 
 // add height mesh

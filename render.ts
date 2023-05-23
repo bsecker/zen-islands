@@ -116,7 +116,7 @@ export class GameRenderer {
     const watergeometry = new THREE.PlaneGeometry(mapWidth, mapHeight);
     const watermaterial = new THREE.MeshLambertMaterial({ color: this.params.waterOverlayColor, side: THREE.DoubleSide, opacity: 0.55, transparent: true });
     const water = new THREE.Mesh(watergeometry, watermaterial);
-    water.position.set(0.5 * mapWidth, 0, 0.5 * mapHeight);
+    water.position.set(0.5 * mapWidth, 1, 0.5 * mapHeight);
     water.rotation.x = -Math.PI / 2;
     // water.position.y = 10;
     this.scene.add(water);
