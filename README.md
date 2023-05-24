@@ -1,5 +1,7 @@
 # Zen Islands
 
+**View the simulation in your browser [here](https://bsecker.github.io/zen-islands/).** Should work on desktops/mobiles.
+
 A small simulation of boats travelling between ports on procedurally generated islands. Made with THREE.js. Inspiration came from this [reddit post](https://old.reddit.com/r/dataisbeautiful/comments/pti39a/7_days_of_ship_traffic_in_the_hawaiian_islands_oc/).
 
 I started this project to simultaneously learn 3D rendering basics and also to play around with ChatGPT and Github Copilot for helping me code. I've had various degrees of success (in terms of accurate/usable code) using the AI tools to help me make this project, but overall I'd definitely say it's noticably increased my productivity.
