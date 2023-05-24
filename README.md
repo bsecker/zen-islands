@@ -57,4 +57,6 @@ Building for production
 
 `npx vite build --minify`
 
+for github pages: add `--base /zen-islands`
+
 (and then manually drag in the `ship-model.obj` to the dist folder for now)
