@@ -4,26 +4,27 @@ A small simulation of boats travelling between ports on procedurally generated i
 
 I started this project to simultaneously learn 3D rendering basics and also to play around with ChatGPT and Github Copilot for helping me code. I've had various degrees of success (in terms of accurate/usable code) using the AI tools to help me make this project, but overall I'd definitely say it's noticably increased my productivity.
 
-![](img/cover.png)
+![](img/covernew.png)
 
 ## TODO
 
 - [ ] improve islandizer so edges are always water
   - Custom curve? start shallow (so can have lots of mountainous in middle), get steep at end?
 - [x] make water 3d - don't set to 0, maybe translucent overlay?
-- [c] switch to typescript
-- [c] change colour palette
+- [x] switch to typescript
+- [x] change colour palette
 - [x] make noise less chaotic - less octaves?
 - [x] change boats to triangles
 - [ ] run each ship in it's own thread, or do pathfinding in seperate thread?
 - [ ] fix x/y getting screwed up - only notice when map is not square
 - [ ] Make background look prettier, figure out a way to blend the mesh so it doesn't look like it's a floating rectangle
 - [ ] fix timer pausing when moving away from the page
-- [ ] host demo on website
+- [x] host demo on website
 - [ ] change pathfinding for boats to follow a path rather than just gravitating towards a moving point
 
 ## Stretch Goals
 
+- [ ] mouse click to add new port
 - [ ] use perlin noise to add subtle biomes
 - [ ] add interactive buttons to regenerate (and do on timer), stop movement, create ships etc
 - [ ] Add seed to noise generator

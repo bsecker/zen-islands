@@ -17,7 +17,7 @@ function islandiseSquare(x: number,y: number, mapWidth: number, low: number, hig
     const distance = Math.max(distance_x, distance_y);
 
     const range = high - low;
-    const rangeValue = range * (distance / (mapWidth));
+    const rangeValue = range * (distance / mapWidth);
 
     // Return the range value plus the minimum value
     let val = low + rangeValue;
@@ -61,7 +61,7 @@ function islandiseRound(x: number,y: number, mapWidth: number, low: number, high
     // return Math.max(low,1-gradient);
 }
 
-export function generateTerrain(noise: any, width: number, height: number, octaves = 6, persistence = 0.501, scale = 0.0008, low = -150, high = 250) {
+export function generateTerrain(noise: any, width: number, height: number, octaves = 5, persistence = 0.50, scale = 0.0010, low = -200, high = 225) {
 // export function generateTerrain(noise: any, width: number, height: number, octaves = 6, persistence = 0.45, scale = 0.0010, low = -150, high = 250) {
   console.log("generating terrain...")
 
@@ -71,7 +71,8 @@ export function generateTerrain(noise: any, width: number, height: number, octav
   // run perlin.sumoctave for every x,y coordinate
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) - islandiseRound(x, y, width, 0, 300);
+      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) - islandiseRound(x, y, width, 0, 150);
+      // if (point < 0) point *= 0.7; // less deep under water
       // round out edges
       terrain[y][x] = point;
     }
