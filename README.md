@@ -50,3 +50,8 @@ Manual terrain testing
 
 `node -r esm heightmap.js`
 
+Building for production
+
+`npx vite build --minify`
+
+(and then manually drag in the `ship-model.obj` to the dist folder for now)

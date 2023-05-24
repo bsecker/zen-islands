@@ -15,7 +15,7 @@ loader.load('ship-model.obj', (object: any) => {
   shipModel.scale.set(0.1, 0.1, 0.1);
   shipModel.children[0].rotation.set(-Math.PI/2, 0, 0);
   console.log("loaded ship model: ", object);
-});
+}, (error: any) => console.error(error));
 
 interface GridNode {
   x: number;

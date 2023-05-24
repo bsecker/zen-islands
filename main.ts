@@ -31,4 +31,8 @@ renderer.scene.add(mesh);
 // renderer.generatePortMeshes(ports);
 // renderer.renderExamplePath(nav.exampleSearch);
 
+// hide the "Loading" div
+const loadingDiv = document.getElementById('loadingDiv');
+loadingDiv!.style.display = 'none';
+
 renderer.animate();

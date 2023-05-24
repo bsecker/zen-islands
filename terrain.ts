@@ -6,23 +6,6 @@ export function distance(x1: number, y1: number, x2: number, y2: number) {
 }
 
 /**
- * given a set of coordinates (x,y), return a normalised value between 0 and 1 of the distance to the center (0,0), where 1 is at the center and 0 is at the edge
- * @param {*} x 
- * @param {*} y 
- */
-function islandise_round(x: number, y: number, width: number) {
-  const dist = distance(width / 2, width / 2, x, y);
-  const maxDist = width / 2;
-  // if distance is larger than the max distance, scale it back to 0 quicker
-  if (dist > maxDist) {
-    return 5 / dist
-  }
-
-  // normalise
-  return 1.00 - (dist / maxDist);
-}
-
-/**
  * given a set of coords (x,y), apply a square mask to the coords so that the edges are lower than the center
  */
 function islandiseSquare(x: number,y: number, mapWidth: number, low: number, high: number) {
@@ -51,7 +34,7 @@ function islandiseSquare(x: number,y: number, mapWidth: number, low: number, hig
 }
 
 /**
- * given a set of coords (x,y), apply a square mask to the coords so that the edges are lower than the center
+ * given a set of coords (x,y), apply a round mask to the coords so that the edges are lower than the center
  */
 function islandiseRound(x: number,y: number, mapWidth: number, low: number, high: number) {
     const max_width = (mapWidth * 0.5);
@@ -78,9 +61,8 @@ function islandiseRound(x: number,y: number, mapWidth: number, low: number, high
     // return Math.max(low,1-gradient);
 }
 
-
-// export function generateTerrain(noise: any, width: number, height: number, octaves = 6, persistence = 0.501, scale = 0.0008, low = -150, high = 250) {
-export function generateTerrain(noise: any, width: number, height: number, octaves = 5, persistence = 0.501, scale = 0.0008, low = -150, high = 250) {
+export function generateTerrain(noise: any, width: number, height: number, octaves = 6, persistence = 0.501, scale = 0.0008, low = -150, high = 250) {
+// export function generateTerrain(noise: any, width: number, height: number, octaves = 6, persistence = 0.45, scale = 0.0010, low = -150, high = 250) {
   console.log("generating terrain...")
 
   // fill empty array
@@ -89,7 +71,7 @@ export function generateTerrain(noise: any, width: number, height: number, octav
   // run perlin.sumoctave for every x,y coordinate
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high)  - islandiseRound(x, y, width, 0, 300);
+      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) - islandiseRound(x, y, width, 0, 300);
       // round out edges
       terrain[y][x] = point;
     }

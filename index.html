@@ -4,7 +4,44 @@
 		<meta charset="utf-8">
 		<title>Island Simulation</title>
 		<style>
-			body { margin: 0; }
+			body { 
+				margin: 0; 
+				font-family:Arial, Helvetica, sans-serif;
+				background-color: #1b1b1b;
+			}
+
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+				color: white;
+				font-style:italic;
+				opacity: 0.7;
+			}
+
+			#info a {
+				color: #b52426;
+				text-decoration: none;
+			}
+
+			#info a:hover {
+				text-decoration: underline;
+			}
+
+			#loadingDiv {
+  			position: absolute;
+  			top: 50%;
+  			left: 50%;
+  			transform: translate(-50%, -50%);
+  			/* background-color: rgba(255, 255, 255, 0.8); */
+				color: #ccc;
+  			padding: 10px;
+  			/* border-radius: 5px; */
+				font-size: 2em;
+			}
 		</style>
 
 <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
@@ -23,6 +60,8 @@
 
 	</head>
 	<body>
+		<div id="info">Drag to rotate. Pinch/scroll to zoom. Refresh page to regenerate. <a href="https://github.com/bsecker/zen-islands">Github</a></div>
+
 		<script type="x-shader/x-vertex" id="vertexShader">
 
 			varying vec3 vWorldPosition;
@@ -55,6 +94,7 @@
 			}
 
 		</script>
+		<div id="loadingDiv">Loading...</div>
 		<script type="module" src="/main.ts"></script>
 	</body>
 </html>
