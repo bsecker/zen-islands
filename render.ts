@@ -183,7 +183,7 @@ export class GameRenderer {
     } );
 
     const sky = new THREE.Mesh( skyGeo, skyMat );
-    console.log("mapWidth", this.mapWidth, "mapHeight", this.mapHeight);
+    // console.log("mapWidth", this.mapWidth, "mapHeight", this.mapHeight);
     // TODO: figure out why this is undefined
     // sky.position.set(this.mapWidth/2,0,this.mapHeight/2);
     sky.position.set(1024,0,1024);

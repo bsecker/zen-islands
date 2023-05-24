@@ -50,9 +50,37 @@ function islandiseSquare(x: number,y: number, mapWidth: number, low: number, hig
     // return Math.max(low,1-gradient);
 }
 
+/**
+ * given a set of coords (x,y), apply a square mask to the coords so that the edges are lower than the center
+ */
+function islandiseRound(x: number,y: number, mapWidth: number, low: number, high: number) {
+    const max_width = (mapWidth * 0.5);
+
+    const distance_x = Math.abs(max_width-x);
+    const distance_y = Math.abs(max_width-y);
+
+    const distance = Math.sqrt(Math.pow(distance_x,2) + Math.pow(distance_y,2));
+
+    const range = high - low;
+    const rangeValue = range * (distance / (mapWidth));
+
+    // Return the range value plus the minimum value
+    let val = low + rangeValue;
+
+    return val;
+
+    // unfinished attempt to make edges drop off daster
+    // return distance > (mapWidth-100) ? val-100: val
+
+    // const delta = distance / max_width;
+    // const gradient = delta * delta;
+
+    // return Math.max(low,1-gradient);
+}
 
 
-export function generateTerrain(noise: any, width: number, height: number, octaves = 6, persistence = 0.501, scale = 0.0008, low = -150, high = 250) {
+// export function generateTerrain(noise: any, width: number, height: number, octaves = 6, persistence = 0.501, scale = 0.0008, low = -150, high = 250) {
+export function generateTerrain(noise: any, width: number, height: number, octaves = 5, persistence = 0.501, scale = 0.0008, low = -150, high = 250) {
   console.log("generating terrain...")
 
   // fill empty array
@@ -61,7 +89,7 @@ export function generateTerrain(noise: any, width: number, height: number, octav
   // run perlin.sumoctave for every x,y coordinate
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high) - islandiseSquare(x, y, width, 0, 300);
+      let point = noise.sum_octave(octaves, x, y, persistence, scale, low, high)  - islandiseRound(x, y, width, 0, 300);
       // round out edges
       terrain[y][x] = point;
     }
