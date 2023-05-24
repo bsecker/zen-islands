@@ -10,19 +10,21 @@ I started this project to simultaneously learn 3D rendering basics and also to p
 
 ## TODO
 
-- [ ] improve islandizer so edges are always water
-  - Custom curve? start shallow (so can have lots of mountainous in middle), get steep at end?
 - [x] make water 3d - don't set to 0, maybe translucent overlay?
 - [x] switch to typescript
 - [x] change colour palette
 - [x] make noise less chaotic - less octaves?
 - [x] change boats to triangles
-- [ ] run each ship in it's own thread, or do pathfinding in seperate thread?
-- [ ] fix x/y getting screwed up - only notice when map is not square
-- [ ] Make background look prettier, figure out a way to blend the mesh so it doesn't look like it's a floating rectangle
-- [ ] fix timer pausing when moving away from the page
 - [x] host demo on website
-- [ ] change pathfinding for boats to follow a path rather than just gravitating towards a moving point
+- [ ] run each ship in it's own thread, or do pathfinding in seperate thread to increase page load speed
+- [ ] improve islandizer so edges are always water
+  - Custom curve? start shallow (so can have lots of mountainous in middle), get steep at end?
+
+## Bug fixes
+
+- [ ] **Fix intersecting mesh of water causing flickering**
+- [ ] fix timer pausing when moving away from the page
+- [ ] fix x/y getting screwed up - only notice when map is not square
 
 ## Stretch Goals
 
@@ -31,6 +33,7 @@ I started this project to simultaneously learn 3D rendering basics and also to p
 - [ ] add interactive buttons to regenerate (and do on timer), stop movement, create ships etc
 - [ ] Add seed to noise generator
 - [ ] add random names to large land-masses
+- [ ] Make background look prettier, figure out a way to blend the mesh so it doesn't look like it's a floating rectangle
 - [ ] add fishing vessels that navigate to random points before returning to port
 - [ ] slow day-night cycle with shadows
 
