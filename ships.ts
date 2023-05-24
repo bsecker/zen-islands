@@ -92,13 +92,6 @@ export class NavigationController {
         }
       });
     });
-
-
-    // kick off initial ship generation at the same time
-    // TODO change this in the future to not start at the same time if it looks weird
-    // this.ports.forEach(port => {
-    //   port.createShip(scene);
-    // });
   }
 
   search(graph: any, start: GridNode, end: GridNode) {
@@ -190,7 +183,7 @@ class Ship {
   targetMoveSpeed: number;
   maxSpeed: number;
   maxForce: number;
-  debugPoint: THREE.Object3D;
+  // debugPoint: THREE.Object3D;
   cube: THREE.Object3D; // THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   constructor(scene: Scene, x: number, y: number, z: number, path: GridNode[], color = 0xffff00) {
     this.scene = scene;

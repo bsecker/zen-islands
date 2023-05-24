@@ -24,13 +24,6 @@ function islandiseSquare(x: number,y: number, mapWidth: number, low: number, hig
 
     return val;
 
-    // unfinished attempt to make edges drop off daster
-    // return distance > (mapWidth-100) ? val-100: val
-
-    // const delta = distance / max_width;
-    // const gradient = delta * delta;
-
-    // return Math.max(low,1-gradient);
 }
 
 /**

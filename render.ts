@@ -90,21 +90,6 @@ export class GameRenderer {
     });
     this.gui.close();
 
-    // sky.material.uniforms[ 'topColor' ]
-
-    // add snowglobe
-    // const spheregeometry = new THREE.SphereGeometry(mapWidth/2, 20, 20, 0, Math.PI*2,);
-    // // const spheregeometry = new THREE.
-    // const spherematerial = new THREE.MeshLambertMaterial({
-    //   color: 0x0000ff,
-    //   side: THREE.DoubleSide,
-    //   opacity: 0.25,
-    //   transparent: true
-    // })
-    // const sphere = new THREE.Mesh(spheregeometry, spherematerial);
-    // sphere.position.set(mapWidth/2, 0, mapHeight/2);
-    // this.scene.add(sphere);
-
     window.onresize = () => {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -196,8 +181,6 @@ export class GameRenderer {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     this.scene.add(ambientLight);
     const light = new THREE.DirectionalLight(0xffffff, 2.3);
-    // light.position.set(this.camera.position.x, this.camera.position.y + 500, this.camera.position.z + 500).normalize();
-    // light.position.set(0, 1000, 0)
     this.scene.add(light);
 
     // background and fog
@@ -313,23 +296,6 @@ export class GameRenderer {
     const mesh = new THREE.Mesh(geometry, material);
     return mesh;
   }
-
-  // generatePortMeshes(ports) {
-  //   ports.forEach(port => {
-  //   })
-  // }
-
-  // renderExamplePath(path) {
-  //   var points = [];
-  //   for (let i = 0; i < path.length; i++) {
-  //     points.push(new THREE.Vector3(path[i].x, 0, path[i].y))
-  //   }
-
-  //   let geometry = new THREE.BufferGeometry().setFromPoints( points );
-  //   let material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
-  //   let line = new THREE.Line( geometry, material );
-  //   this.scene.add( line );
-  // }
 
   animate() {
 
