@@ -1,9 +1,12 @@
 import * as THREE from 'three';
 import { Scene } from 'three';
+
+
+// ignore some .js files that don't have typescript definitions
 // @ts-ignore
 import * as PATH from './pathfinding'
+// @ts-ignore
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const loader = new OBJLoader();
 let shipModel: THREE.Object3D;
@@ -334,10 +337,12 @@ function addShipModel(scene: Scene, x: number, y: number, z: number, color: numb
   modelInstance.position.set(x, y, z);
 
   // Clone and set material
+  // @ts-ignore TODO - fix this
   const material = (modelInstance.children[0].material as THREE.MeshStandardMaterial).clone();
   material.color.setHex(color);
   material.needsUpdate = true;
 
+  // @ts-ignore TODO - fix this
   modelInstance.children[0].material = material;
 
   // Add the model instance to the scene
