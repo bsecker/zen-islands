@@ -165,19 +165,6 @@ export class NavigationController {
       return 0; 
     } 
 
-    // map height between heightmin and heightmax
-    // Y = (X-A)/(B-A) * (D-C) + C
-    // height = Math.abs(height);
-    // height = (height - 1)/299 * (heightmax-heightmin) + 1
-
-    // prefer deeper water
-    // switch(true) {
-    //   case height < 50: return 1;
-    //   case height < 20: return 2;
-    //   case height < 10: return 3;
-    //   case height < 0: return 4;
-    //   default: return 1
-    // }
     const weight = 1 + 1 / Math.abs(height * 0.25) //+ (1 / Math.abs(height) * 0.5);
 
     return weight > 20 ? 20 : weight;
@@ -185,6 +172,12 @@ export class NavigationController {
   }
 }
 
+/**
+ * Right now, ships are pretty basic. They're like greyhounds chasing a moving target. The target is a point along the line given by the pathfinding algorithm. The ship uses forces to steer towards that point.
+ * 
+ * Given enough time I would change this to something like described here:
+ * https://natureofcode.com/book/chapter-6-autonomous-agents/
+ */
 class Ship {
   scene: Scene;
   path: GridNode[];
@@ -197,6 +190,7 @@ class Ship {
   targetMoveSpeed: number;
   maxSpeed: number;
   maxForce: number;
+  debugPoint: THREE.Object3D;
   cube: THREE.Object3D; // THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   constructor(scene: Scene, x: number, y: number, z: number, path: GridNode[], color = 0xffff00) {
     this.scene = scene;
@@ -211,13 +205,32 @@ class Ship {
 
     this.alive = true;
     this.targetMoveSpeed = 1; 
-    this.maxSpeed = 0.7;
-    this.maxForce = 0.03;
+    this.maxSpeed = 2;
+    this.maxForce = 1;
 
     this.cube = addShipModel(this.scene, x, y, z, color);
+
+    // this.path.forEach(point => {
+    //   const cube = new THREE.Mesh(
+    //     new THREE.BoxGeometry(1,1,1),
+    //     new THREE.MeshBasicMaterial({color: 0x00ff00})
+    //   )
+    //   cube.position.set(point.x, 0, point.y)
+    //   this.scene.add(cube)
+    // })
+
+    // const cube = new THREE.Mesh(
+    //   new THREE.BoxGeometry(3,3,3),
+    //   new THREE.MeshBasicMaterial({color: 0xff0000})
+    // )
+    // cube.position.set(x, 0, y)
+    // this.scene.add(cube)
+    // this.debugPoint = cube;
   }
 
   update() {
+
+    // this.debugPoint.position.set(this.path[this.targetIndex].x, 0, this.path[this.targetIndex].y)
 
     // console.log(this.position, this.velocity, this.accel)
 
@@ -238,8 +251,18 @@ class Ship {
 
     // const desired = target.sub(this.position);
     const desired = new THREE.Vector3().subVectors(target, this.position);
+
+    const distance = desired.length();
     desired.normalize()
-    desired.multiplyScalar(this.maxSpeed);
+
+    if (distance < 100) {
+      // slow down
+      const m = map(distance, 0, 100, 0, this.maxSpeed);
+      desired.multiplyScalar(m);
+    } else {
+      // full speed
+      desired.multiplyScalar(this.maxSpeed);
+    }
 
     const steer = new THREE.Vector3().subVectors(desired, this.velocity);
 
@@ -349,4 +372,8 @@ function addShipModel(scene: Scene, x: number, y: number, z: number, color: numb
   scene.add(modelInstance);
   
   return modelInstance;
+}
+
+function map(value: number, istart: number, istop: number, ostart: number, ostop: number) {
+  return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 }
